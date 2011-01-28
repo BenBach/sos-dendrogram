@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE palette SYSTEM "somtoolboxPalette.dtd">
+
+<!-- Color-Palette for SOMViewer -->
+<palette version="1.0" group="Single Color">
+  <shortName>Grayscale16</shortName>
+  <longName>Grayscale, 16 Gradient</longName>
+  <description>Grayscale palette well suited for b/w screenshots</description>
+  <colors>
+    <color>
+      <red>50</red>
+      <green>50</green>
+      <blue>50</blue>
+    </color>
+    <color>
+      <red>62</red>
+      <green>62</green>
+      <blue>62</blue>
+    </color>
+    <color>
+      <red>75</red>
+      <green>75</green>
+      <blue>75</blue>
+    </color>
+    <color>
+      <red>88</red>
+      <green>88</green>
+      <blue>88</blue>
+    </color>
+    <color>
+      <red>101</red>
+      <green>101</green>
+      <blue>101</blue>
+    </color>
+    <color>
+      <red>114</red>
+      <green>114</green>
+      <blue>114</blue>
+    </color>
+    <color>
+      <red>126</red>
+      <green>126</green>
+      <blue>126</blue>
+    </color>
+    <color>
+      <red>139</red>
+      <green>139</green>
+      <blue>139</blue>
+    </color>
+    <color>
+      <red>152</red>
+      <green>152</green>
+      <blue>152</blue>
+    </color>
+    <color>
+      <red>165</red>
+      <green>165</green>
+      <blue>165</blue>
+    </color>
+    <color>
+      <red>178</red>
+      <green>178</green>
+      <blue>178</blue>
+    </color>
+    <color>
+      <red>190</red>
+      <green>190</green>
+      <blue>190</blue>
+    </color>
+    <color>
+      <red>203</red>
+      <green>203</green>
+      <blue>203</blue>
+    </color>
+    <color>
+      <red>216</red>
+      <green>216</green>
+      <blue>216</blue>
+    </color>
+    <color>
+      <red>229</red>
+      <green>229</green>
+      <blue>229</blue>
+    </color>
+    <color>
+      <red>242</red>
+      <green>242</green>
+      <blue>242</blue>
+    </color>
+  </colors>
+</palette>
+
