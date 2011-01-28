@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="somtoolbox" basedir="C:/workspace/somtoolbox" default="build">
+	<property name="app.name" value="SOMToolbox" />
+	<property name="app.version.major" value="0.7.5" />
+	<property name="app.version.minor" value="2" />
+	<!-- Dynamically set in target setVersion:
+	<property name="app.version.rev" value=""/>
+	<property name="app.version.buildtag" value=""/>
+	<property name="app.version" value=""/> 
+	-->
+	<property name="app.website" value="http://www.ifs.tuwien.ac.at/dm/somtoolbox/" />
+
+	<property name="javadoc.title" value="${app.name}" />
+
+	<property name="src" location="src" />
+	<property name="lib" location="lib" />
+	<property name="doc" location="doc" />
+	<property name="javadoc" location="${doc}/api" />
+	<property name="dist" location="dist" />
+	<property name="izpack" location="${dist}/IzPack" />
+	<property name="bin" location="bin" />
+	<property name="test" location="${basedir}/tests" />
+
+	<property name="component-main" value="core" />
+	<property name="component-opt" value="optional" />
+	<property name="component-test" value="test" />
+
+	<property name="codename" value="" />
+	<property name="extra.maps.dir" value="" />
+
+	<property name="jar.basename" value="${ant.project.name}" />
+	<property name="pkg.basename" value="${ant.project.name}" />
+	<property name="filname.infix.opt" value="+opt" />
+
+	<property name="filname.suffix.src" value="+src" />
+	<property name="filname.suffix.doc" value="+doc" />
+	<property name="filname.suffix.fat" value="_full" />
+
+	<property name="app.version.file" location="${src}/${component-main}/at/tuwien/ifs/somtoolbox/SOMToolboxMetaConstants.java" />
+
+	<!-- some extra ant-tasks... -->
+	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask">
+		<classpath>
+			<pathelement location="${lib}/ant/xmltask.jar" />
+		</classpath>
+	</taskdef>
+<!--
+	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask">
+		<classpath>
+			<fileset dir="${lib}/ant/IzPack">
+				<include name="**/*.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml">
+		<classpath>
+			<fileset dir="${lib}/ant/svnant">
+				<include name="**/*.jar" />
+			</fileset>
+		</classpath>
+	</typedef>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${lib}/ant/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	 end of extra ant tasks -->
+
+	<fileset dir="${lib}" id="libs">
+		<include name="*.jar" />
+	</fileset>
+	<fileset dir="${lib}/${component-opt}" id="libs.opt">
+		<include name="*.jar" />
+	</fileset>
+	<fileset dir="${lib}/${component-test}" id="libs.test">
+		<include name="*.jar" />
+	</fileset>
+	<fileset dir="${lib}" id="libs.dev">
+		<include name="doc/" />
+		<include name="src/" />
+	</fileset>
+
+	<path id="classpath">
+		<fileset refid="libs" />
+	</path>
+
+	<path id="classpath.opt">
+		<fileset refid="libs" />
+		<fileset refid="libs.opt" />
+	</path>
+
+	<path id="classpath.test">
+		<fileset refid="libs" />
+		<fileset refid="libs.opt" />
+		<fileset refid="libs.test" />
+	</path>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: init                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="init" depends="getVersion">
+		<tstamp />
+		<mkdir dir="${bin}" />
+		<mkdir dir="${src}/${component-main}" />
+		<mkdir dir="${bin}/${component-main}" />
+		<mkdir dir="${src}/${component-opt}" />
+		<mkdir dir="${bin}/${component-opt}" />
+		<mkdir dir="${src}/${component-test}" />
+		<mkdir dir="${bin}/${component-test}" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${javadoc}" />
+		<mkdir dir="${test}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin}" />
+		<delete dir="${javadoc}" />
+		<delete id="test">
+			<fileset dir="${dist}" id="del">
+				<include name="*.jar" />
+				<include name="*.zip" />
+				<include name="*.exe" />
+				<include name="*.tar.gz" />
+			</fileset>
+		</delete>
+		<delete dir="${test}" />
+	</target>
+
+	<!-- ================================= 
+          target: calculatet the version string based on the values set in app.version.major, app.version.minor and the svn status.              
+         ================================= -->
+	<target name="getVersion" description="build the version string">
+		<property name="wcopy" location="${basedir}" />
+		<tstamp>
+			<format property="vDATE" pattern="yyyyMMdd" />
+			<format property="vTIME" pattern="HHmm" />
+		</tstamp>
+		
+
+		
+				<property name="app.version.rev" value="xCustom" />
+				<property name="app.version.buildtag" value="b${vDATE}${vTIME}" />
+				<property name="app.version" value="${app.version.major}-${app.version.minor}.${app.version.rev}+${app.version.buildtag}" />
+		
+			
+	
+		<echo level="info">${app.name}: ${app.version}</echo>
+		<echo level="info">Major: ${app.version.major}</echo>
+		<echo level="info">Minor: ${app.version.minor}</echo>
+		<echo level="info">Rev: ${app.version.rev}</echo>
+		<echo level="info">Buildtag: ${app.version.buildtag}</echo>
+		<echo level="info">Version: ${app.version}</echo>
+		<echo level="info">VersionM: ${app.version.major}</echo>
+		<echo level="info">VersionMM: ${app.version.major}-${app.version.minor}</echo>
+		<echo level="info">VersionMMR: ${app.version.major}-${app.version.minor}.${app.version.rev}</echo>
+	</target>
+
+	<!-- ================================= 
+          target: build              
+         ================================= -->
+	<target name="build" depends="build-core,build-opt,build-tests" description="Build the ${ant.project.name}" />
+
+	<target name="build-core" depends="init" description="Build the ${ant.project.name}">
+		<!-- Set the version string -->
+		<tempfile property="_build.tmp" destdir="${java.io.tmpdir}" />
+		<copy file="${app.version.file}" tofile="${_build.tmp}" preservelastmodified="yes" overwrite="yes" />
+
+		<replaceregexp flags="g" byline="false">
+			<fileset file="${app.version.file}" />
+			<regexp pattern="public static final String VERSION =.*" />
+			<substitution expression='public static final String VERSION = "${app.version}";' />
+		</replaceregexp>
+
+		<copy todir="${bin}/${component-main}/rsc">
+			<fileset dir="${src}/${component-main}/rsc/">
+				<include name="**" />
+			</fileset>
+		</copy>
+
+		<javac srcdir="${src}/${component-main}" destdir="${bin}/${component-main}" classpathref="classpath" debug="on" includeantruntime="false">
+			<exclude name="**/package-info.java" />
+		</javac>
+
+		<!-- clean up again! -->
+		<copy tofile="${app.version.file}" file="${_build.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<delete file="${_build.tmp}" />
+	</target>
+
+	<target name="build-opt" depends="build-core">
+		<javac srcdir="${src}/${component-opt}" destdir="${bin}/${component-opt}" debug="on" includeantruntime="false">
+			<classpath>
+				<path path="${bin}/${component-main}" />
+				<path refid="classpath.opt" />
+			</classpath>
+			<exclude name="**/package-info.java" />
+		</javac>
+	</target>
+
+	<target name="build-tests" depends="build-core,build-opt">
+		<copy todir="${bin}/${component-test}/">
+			<fileset dir="${src}/${component-test}/">
+				<include name="**" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<javac srcdir="${src}/${component-test}" destdir="${bin}/${component-test}" debug="on" includeantruntime="false">
+			<classpath>
+				<path path="${bin}/${component-main}" />
+				<path path="${bin}/${component-test}" />
+				<path refid="classpath.test" />
+			</classpath>
+			<exclude name="**/package-info.java" />
+		</javac>
+	</target>
+
+
+	<!-- ================================= 
+          target: javadoc-core              
+         ================================= -->
+	<target name="javadoc-core" depends="init" description="Create javadoc-API, for the core package only">
+		<!-- Set the version string -->
+		<tempfile property="_javadoc-core.tmp" destdir="${java.io.tmpdir}" />
+
+		<copy file="${app.version.file}" tofile="${_javadoc-core.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<replaceregexp flags="g" byline="false">
+			<fileset file="${app.version.file}" />
+			<regexp pattern="public static final String VERSION =.*" />
+			<substitution expression='public static final String VERSION = "${app.version}";' />
+		</replaceregexp>
+
+		<copy file="${doc}/background.jpg" todir="${javadoc}" />
+		<javadoc destdir="${javadoc}" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="at.tuwien.ifs.somtoolbox.**.*" stylesheetfile="${doc}/style.css" doctitle="${javadoc.title}">
+			<packageset dir="${src}/${component-main}" />
+			<classpath refid="classpath" />
+			<link href="http://java.sun.com/javase/6/docs/api/" />
+		</javadoc>
+
+		<!-- clean up again! -->
+		<copy tofile="${app.version.file}" file="${_javadoc-core.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<delete file="${_javadoc-core.tmp}" />
+	</target>
+
+	<!-- ================================= 
+          target: runnablesReferenceDoc             
+         ================================= -->
+	<target name="runnablesReferenceDoc" depends="build">
+		<tempfile property="temp.file" destdir="${java.io.tmpdir}" />
+		<!-- Note: using fork="true" was necessary, otherwise the JVM would not have the usual classpath, and thus not find any runnable ! -->
+		<java classname="at.tuwien.ifs.somtoolbox.doc.RunnablesReferenceCreator" fork="true" output="${temp.file}">
+			<classpath>
+				<path path="${bin}/${component-main}" />
+				<path refid="classpath" />
+			</classpath>
+		</java>
+		<loadfile property="appContent" srcfile="${temp.file}" />
+		<replaceregexp file="doc/somtoolbox-reference.html" flags="s" byline="false">
+			<regexp pattern="&lt;!-- MARKER BEGIN GENERATED CONTENT.*MARKER END GENERATED CONTENT -->" />
+			<substitution expression="&lt;!-- MARKER BEGIN GENERATED CONTENT --> ${appContent} &lt;!-- MARKER END GENERATED CONTENT -->" />
+		</replaceregexp>
+		<delete file="${temp.file}" />
+	</target>
+
+	<!-- ================================= 
+          target: javadoc             
+         ================================= -->
+	<target name="javadoc" depends="init" description="Create complete javadoc-API, for core, optional and testing packages">
+		<!-- Set the version string -->
+		<tempfile property="_javadoc.tmp" destdir="${java.io.tmpdir}" />
+
+		<copy file="${app.version.file}" tofile="${_javadoc.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<replaceregexp flags="g" byline="false">
+			<fileset file="${app.version.file}" />
+			<regexp pattern="public static final String VERSION =.*" />
+			<substitution expression='public static final String VERSION = "${app.version}";' />
+		</replaceregexp>
+
+		<copy file="${doc}/background.jpg" todir="${javadoc}" />
+		<javadoc destdir="${javadoc}" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="at.tuwien.ifs.somtoolbox.**.*" stylesheetfile="${doc}/style.css" doctitle="${javadoc.title}">
+			<packageset dir="${src}/${component-main}" />
+			<packageset dir="${src}/${component-opt}" />
+			<packageset dir="${src}/${component-test}" />
+
+			<classpath refid="classpath.test" />
+			<link href="http://java.sun.com/javase/6/docs/api/" />
+		</javadoc>
+
+		<!-- clean up again! -->
+		<copy tofile="${app.version.file}" file="${_javadoc.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<delete file="${_javadoc.tmp}" />
+	</target>
+
+	<!-- ================================= 
+          target: dist              
+         ================================= -->
+	<target name="dist" depends="build" description="Build a jar">
+		<copy file="doc/licenses/ApacheLicense2.0.txt" tofile="LICENSE.txt" />
+
+		<jar destfile="${dist}/${jar.basename}.jar" basedir="${bin}/${component-main}">
+			<manifest>
+				<attribute name="Main-Class" value="at.tuwien.ifs.somtoolbox.apps.SOMToolboxMain" />
+				<attribute name="Specification-Title" value="${ant.project.name}" />
+				<attribute name="Specification-Version" value="${app.version.major}" />
+				<attribute name="Specification-Vendor" value="IFS, Vienna University of Technology" />
+				<attribute name="Implementation-Title" value="${ant.project.name}" />
+				<attribute name="Implementation-Version" value="${app.version}" />
+				<attribute name="Implementation-Vendor" value="IFS, Vienna University of Technology" />
+			</manifest>
+			<metainf file="LICENSE.txt" />
+			<metainf file="NOTICE.txt" />
+		</jar>
+		<copy todir="${basedir}" file="${dist}/${jar.basename}.jar" />
+
+		<jar destfile="${dist}/${jar.basename}${filname.infix.opt}.jar" basedir="${bin}/${component-opt}">
+			<manifest>
+				<attribute name="Specification-Title" value="${ant.project.name}" />
+				<attribute name="Specification-Version" value="${app.version.major}" />
+				<attribute name="Specification-Vendor" value="IFS, Vienna University of Technology" />
+				<attribute name="Implementation-Title" value="${ant.project.name}" />
+				<attribute name="Implementation-Version" value="${app.version}" />
+				<attribute name="Implementation-Vendor" value="IFS, Vienna University of Technology" />
+			</manifest>
+		</jar>
+		<copy todir="${basedir}" file="${dist}/${jar.basename}${filname.infix.opt}.jar" />
+
+		<delete file="LICENSE.txt" />
+	</target>
+
+	<!-- ================================= 
+          target: fatjar              
+         ================================= -->
+	<target name="fatjar" depends="dist" description="Build a single jar containing also the full classpath">
+		<jar destfile="${dist}/${jar.basename}${filname.suffix.fat}.jar" filesetmanifest="merge">
+			<manifest>
+				<section name="Referenced Libs">
+					<attribute name="Info" value="Additional libraries are provided as-is, and might fall under different licenses." />
+				</section>
+			</manifest>
+			<zipgroupfileset file="${dist}/${jar.basename}.jar" />
+			<zipgroupfileset refid="libs" />
+			<zipfileset dir="${doc}" prefix="doc" />
+		</jar>
+
+		<jar destfile="${dist}/${jar.basename}${filname.infix.opt}${filname.suffix.fat}.jar" filesetmanifest="merge">
+			<zipgroupfileset file="${dist}/${jar.basename}${filname.suffix.fat}.jar" />
+			<zipgroupfileset file="${dist}/${jar.basename}${filname.infix.opt}.jar" />
+			<zipgroupfileset refid="libs.opt" />
+		</jar>
+
+	</target>
+
+
+	<target name="dist+doc" depends="dist, javadoc">
+		<jar jarfile="${dist}/${jar.basename}${filname.suffix.doc}.jar">
+			<zipgroupfileset file="${dist}/${jar.basename}.jar" />
+			<zipfileset dir="${doc}" prefix="doc" />
+		</jar>
+
+		<jar jarfile="${dist}/${jar.basename}${filname.infix.opt}${filname.suffix.doc}.jar">
+			<zipgroupfileset file="${dist}/${jar.basename}.jar" />
+			<zipgroupfileset file="${dist}/${jar.basename}${filname.infix.opt}.jar" />
+		</jar>
+	</target>
+
+	<!-- ================================= 
+          target: dist+src              
+         ================================= -->
+	<target name="dist+src" depends="dist" description="Create jar with included sources.">
+		<!-- Set the version string -->
+		<tempfile property="_dist+src.tmp" destdir="${java.io.tmpdir}" />
+
+		<copy file="${app.version.file}" tofile="${_dist+src.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<replaceregexp flags="g" byline="false">
+			<fileset file="${app.version.file}" />
+			<regexp pattern="public static final String VERSION =.*" />
+			<substitution expression='public static final String VERSION = "${app.version}";' />
+		</replaceregexp>
+
+		<jar destfile="${dist}/${jar.basename}${filname.suffix.src}.jar">
+			<zipgroupfileset file="${dist}/${jar.basename}.jar" />
+			<zipfileset dir="${src}/${component-main}" prefix="src">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+		</jar>
+
+		<jar destfile="${dist}/${jar.basename}${filname.infix.opt}${filname.suffix.src}.jar">
+			<zipgroupfileset file="${dist}/${jar.basename}${filname.suffix.src}.jar" />
+			<zipgroupfileset file="${dist}/${jar.basename}${filname.infix.opt}.jar" />
+			<zipfileset dir="${src}/${component-opt}" prefix="src">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+		</jar>
+
+		<!-- clean up again! -->
+		<copy tofile="${app.version.file}" file="${_dist+src.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<delete file="${_dist+src.tmp}" />
+	</target>
+
+	<!-- ================================= 
+          target: package              
+         ================================= -->
+	<target name="package" depends="package-core,package-optional" description="Create Packages" />
+
+	<target name="package-core" depends="dist,javadoc-core,runnablesReferenceDoc">
+		<!-- Set the version string -->
+		<tempfile property="_package-core.tmp" destdir="${java.io.tmpdir}" />
+
+		<copy file="${app.version.file}" tofile="${_package-core.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<replaceregexp flags="g" byline="false">
+			<fileset file="${app.version.file}" />
+			<regexp pattern="public static final String VERSION =.*" />
+			<substitution expression='public static final String VERSION = "${app.version}";' />
+		</replaceregexp>
+
+		<zip destfile="${dist}/${pkg.basename}_${app.version}.zip">
+			<zipfileset dir="${basedir}" filemode="664">
+				<include name="somtoolbox.*" />
+				<exclude name="somtoolbox.sh" />
+				<include name="somviewer.prop*" />
+				<include name="ChangeLog" />
+				<include name="LICENSES-libraries" />
+			</zipfileset>
+			<zipfileset dir="${basedir}" filemode="775">
+				<include name="somtoolbox.sh" />
+			</zipfileset>
+			<zipfileset refid="libs" prefix="lib" filemode="664" />
+			<zipfileset dir="${doc}" prefix="doc" filemode="664">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+		</zip>
+		<!-- Re-package as tar.gz -->
+		<tar destfile="${dist}/${pkg.basename}_${app.version}.tar.gz" compression="gzip" longfile="gnu">
+			<zipfileset src="${dist}/${pkg.basename}_${app.version}.zip" />
+		</tar>
+
+		<!-- Clean classpath by removing optional/ and test/ entries -->
+		<tempfile property="tmp.cp" destdir="${java.io.tmpdir}" />
+		<copy file="${basedir}/.classpath" tofile="${tmp.cp}" preservelastmodified="yes" />
+		<xmltask source="${tmp.cp}" dest="${basedir}/.classpath">
+			<remove path="classpath/classpathentry[@kind='lib'][contains(@path,'/optional/')]" />
+			<remove path="classpath/classpathentry[@kind='lib'][contains(@path,'/test/')]" />
+			<remove path="classpath/classpathentry[@kind='src'][contains(@path,'/optional')]" />
+			<remove path="classpath/classpathentry[@kind='src'][contains(@path,'/test')]" />
+		</xmltask>
+		<!-- Create the package -->
+		<zip destfile="${dist}/${pkg.basename}_${app.version}${filname.suffix.src}.zip">
+			<zipfileset dir="${basedir}" filemode="664">
+				<include name="somtoolbox.*" />
+				<exclude name="somtoolbox.sh" />
+				<include name="somviewer.prop*" />
+				<include name="ChangeLog" />
+				<include name="LICENSES-libraries" />
+				<include name=".settings/*" />
+				<include name=".classpath" />
+				<include name=".project" />
+				<include name="build.xml" />
+			</zipfileset>
+			<zipfileset dir="${basedir}" filemode="775">
+				<include name="somtoolbox.sh" />
+			</zipfileset>
+			<zipfileset refid="libs" prefix="lib" filemode="664" />
+			<zipfileset refid="libs.dev" prefix="lib" filemode="664" />
+			<zipfileset dir="${doc}" prefix="doc" filemode="664">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+			<zipfileset dir="${src}/${component-main}" prefix="src/${component-main}" filemode="664">
+				<include name="rsc/**" />
+				<include name="**/*.java" />
+			</zipfileset>
+		</zip>
+
+		<!-- Re-package as tar.gz -->
+		<tar destfile="${dist}/${pkg.basename}_${app.version}${filname.suffix.src}.tar.gz" compression="gzip" longfile="gnu">
+			<zipfileset src="${dist}/${pkg.basename}_${app.version}${filname.suffix.src}.zip" />
+		</tar>
+
+		<!-- Restore classpath -->
+		<copy tofile="${basedir}/.classpath" file="${tmp.cp}" overwrite="yes" preservelastmodified="yes" />
+		<delete file="${tmp.cp}" />
+		<!-- clean up again! -->
+		<copy tofile="${app.version.file}" file="${_package-core.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<delete file="${_package-core.tmp}" />
+	</target>
+
+	<target name="package-optional" depends="dist,javadoc,runnablesReferenceDoc">
+		<!-- Set the version string -->
+		<tempfile property="_package-optional.tmp" destdir="${java.io.tmpdir}" />
+
+		<copy file="${app.version.file}" tofile="${_package-optional.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<replaceregexp flags="g" byline="false">
+			<fileset file="${app.version.file}" />
+			<regexp pattern="public static final String VERSION =.*" />
+			<substitution expression='public static final String VERSION = "${app.version}";' />
+		</replaceregexp>
+
+
+		<zip destfile="${dist}/${pkg.basename}${filname.infix.opt}_${app.version}.zip">
+			<zipfileset dir="${basedir}" filemode="664">
+				<include name="${jar.basename}.*" />
+				<exclude name="somtoolbox.sh" />
+				<include name="somviewer.prop*" />
+				<include name="ChangeLog" />
+				<include name="LICENSES-libraries" />
+			</zipfileset>
+			<zipfileset dir="${basedir}" prefix="lib" filemode="664">
+				<include name="${jar.basename}${filname.infix.opt}.jar" />
+			</zipfileset>
+			<zipfileset dir="${basedir}" filemode="775">
+				<include name="somtoolbox.sh" />
+			</zipfileset>
+			<zipfileset refid="libs" prefix="lib" filemode="664" />
+			<zipfileset refid="libs.opt" prefix="lib" filemode="644" />
+			<zipfileset dir="${doc}" prefix="doc" filemode="664">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+		</zip>
+		<tar destfile="${dist}/${pkg.basename}${filname.infix.opt}_${app.version}.tar.gz" compression="gzip" longfile="gnu">
+			<zipfileset src="${dist}/${pkg.basename}${filname.infix.opt}_${app.version}.zip" />
+		</tar>
+
+		<zip destfile="${dist}/${pkg.basename}${filname.infix.opt}_${app.version}${filname.suffix.src}.zip">
+			<zipfileset dir="${basedir}" filemode="664">
+				<include name="${jar.basename}.*" />
+				<exclude name="somtoolbox.sh" />
+				<include name="somviewer.prop*" />
+				<include name="ChangeLog" />
+				<include name="LICENSES-libraries" />
+				<!-- include name=".settings/*" / -->
+				<include name=".classpath" />
+				<include name=".project" />
+				<include name="build.xml" />
+			</zipfileset>
+			<zipfileset dir="${basedir}" prefix="lib" filemode="644">
+				<include name="${jar.basename}${filname.infix.opt}.jar" />
+			</zipfileset>
+			<zipfileset dir="${basedir}" filemode="775">
+				<include name="somtoolbox.sh" />
+			</zipfileset>
+			<zipfileset dir="${lib}" prefix="lib" filemode="664">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+			<zipfileset dir="${doc}" prefix="doc" filemode="664">
+				<include name="**" />
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+			<zipfileset dir="${src}" prefix="src" filemode="664">
+				<exclude name="**/.svn/**" />
+			</zipfileset>
+		</zip>
+		<tar destfile="${dist}/${pkg.basename}${filname.infix.opt}_${app.version}${filname.suffix.src}.tar.gz" compression="gzip" longfile="gnu">
+			<zipfileset src="${dist}/${pkg.basename}${filname.infix.opt}_${app.version}${filname.suffix.src}.zip" />
+		</tar>
+
+		<!-- clean up again! -->
+		<copy tofile="${app.version.file}" file="${_package-optional.tmp}" preservelastmodified="yes" overwrite="yes" />
+		<delete file="${_package-optional.tmp}" />
+	</target>
+
+	<target name="insertLicenseHeader">
+		<loadfile property="licenseHeader" srcfile="licenses/somtoolboxLicenseHeader.txt" />
+		<replaceregexp flags="s" byline="false">
+			<fileset dir="src/core" includes="**/*.java" />
+			<regexp pattern=".*package at.tuwien.ifs" />
+			<substitution expression="${licenseHeader}package at.tuwien.ifs" />
+		</replaceregexp>
+	</target>
+
+	<!-- ================================= 
+          target: test-junit              
+         ================================= -->
+	<target name="test-junit" depends="build-tests">
+		<junit filtertrace="on" fork="on" showoutput="yes">
+			<classpath>
+				<path path="${bin}/${component-main}" />
+				<path path="${bin}/${component-opt}" />
+				<path path="${bin}/${component-test}" />
+
+				<path refid="classpath.test" />
+			</classpath>
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${test}">
+				<fileset dir="${src}/${component-test}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<!-- ================================= 
+          target: test-package              
+         ================================= -->
+	<target name="test-package" depends="dist">
+		<exec os="Windows" executable="${basedir}/somtoolbox.bat" failonerror="true">
+			<arg line="--list-mains" />
+		</exec>
+		<exec os="Linux" executable="${basedir}/somtoolbox.sh" failonerror="true" output="/dev/null">
+			<env key="TERM" value="dumb" />
+			<arg line="--list-mains" />
+		</exec>
+	</target>
+
+	<!-- ================================= 
+          target: test-tarballs              
+         ================================= -->
+	<target name="test-tarballs" depends="package">
+		<tempfile property="tmp.dir" destdir="${java.io.tmpdir}" />
+		<mkdir dir="${tmp.dir}" />
+		<untar src="${dist}/${pkg.basename}_${app.version}.tar.gz" dest="${tmp.dir}" compression="gzip" overwrite="yes" />
+		<chmod perm="775" file="${tmp.dir}/somtoolbox.sh" />
+		<echo>Testing Package</echo>
+		<ant antfile="${tmp.dir}/build.xml" target="test-package" dir="${tmp.dir}" inheritall="false" output="test.log" />
+		<delete dir="${tmp.dir}" />
+
+		<tempfile property="tmp.dir" destdir="${java.io.tmpdir}" />
+		<mkdir dir="${tmp.dir}" />
+		<untar src="${dist}/${pkg.basename}_${app.version}${filname.suffix.src}.tar.gz" dest="${tmp.dir}" compression="gzip" overwrite="yes" />
+		<chmod perm="775" file="${tmp.dir}/somtoolbox.sh" />
+		<echo>Testing Package (inkl. opt)</echo>
+		<ant antfile="${tmp.dir}/build.xml" target="test-package" dir="${tmp.dir}" inheritall="false" output="test.log" />
+		<delete dir="${tmp.dir}" />
+	</target>
+
+
+	<!-- ================================= 
+          target: test-all              
+         ================================= -->
+	<target name="test-all" depends="test-junit,test-package,test-tarballs" description="Run all Tests" />
+
+
+	<!-- ================================= 
+          target: windows-installer              
+         ================================= -->
+	<target name="installer" depends="installer-offline,installer-online" description="Create Installers">
+	</target>
+
+	<target name="installer-offline" depends="dist,javadoc-core">
+		<echo>
+			Adding extra maps from ${extra.maps.dir}
+		</echo>
+		<izpack output="${dist}/${app.name}_${app.version}-setup.jar" inheritAll="true" basedir="${basedir}" input="${izpack}/install.xml" installertype="standard">
+		</izpack>
+		<exec executable="python" dir="${dist}" os="Linux,Solaris,SunOS">
+			<arg file="${izpack}/mkexe/izpack2exe.py" />
+			<arg line="--file=${dist}/${app.name}_${app.version}-setup.jar" />
+			<arg line="--output=${dist}/${app.name}_${app.version}-setup.exe" />
+		</exec>
+	</target>
+
+	<target name="installer-online" depends="dist,javadoc-core">
+		<echo>
+			Adding extra maps from ${extra.maps.dir}
+		</echo>
+		<izpack output="${dist}/${app.name}_${app.version}-netsetup.jar" inheritAll="true" basedir="${basedir}" input="${izpack}/install.xml" installertype="web">
+		</izpack>
+		<exec executable="python" dir="${dist}" os="Linux,Solaris,SunOS">
+			<arg file="${izpack}/mkexe/izpack2exe.py" />
+			<arg line="--file=${dist}/${app.name}_${app.version}-netsetup.jar" />
+			<arg line="--output=${dist}/${app.name}_${app.version}-netsetup.exe" />
+		</exec>
+	</target>
+
+</project>

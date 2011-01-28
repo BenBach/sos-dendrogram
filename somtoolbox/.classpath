@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<classpath>
+	<classpathentry kind="src" path="src/core"/>
+	
+	
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/colt-1.2.0.jar" sourcepath="lib/src/colt-1.2.0-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/somtoolbox/lib/doc/colt-1.2.0-doc.zip!/colt-1.2.0-doc/api"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar" sourcepath="lib/src/commons-collections-3.2.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.3.jar" sourcepath="lib/src/commons-lang-2.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar" sourcepath="lib/src/commons-logging-1.1-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/somtoolbox/lib/doc/commons-logging-1.1-doc.zip!/commons-logging-1.1/docs/apidocs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/commons-math-1.2.jar" sourcepath="lib/src/commons-math-1.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/somtoolbox/lib/doc/commons-math-1.1-doc.zip!/commons-math-1.1/docs/apidocs"/>
+		</attributes>
+	</classpathentry>
+	
+	
+	
+	<classpathentry kind="lib" path="lib/jgrid.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.5.jar" sourcepath="lib/src/jcommon-1.0.5-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/somtoolbox/lib/doc/jcommon-1.0.5-doc.zip!/javadoc"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jdom-1.0.jar" sourcepath="lib/src/jdom-1.0-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/somtoolbox-HEAD/lib/doc/jdom-1.0-doc.zip!/jdom-1.0/apidocs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.2.jar" sourcepath="lib/src/jfreechart-1.0.2-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/somtoolbox/lib/doc/jfreechart-1.0.2-doc.zip!/jfreechart-1.0.2-javadocs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jmatharray-20081031.jar"/>
+	<classpathentry kind="lib" path="lib/jmathplot-20081031.jar"/>
+	<classpathentry kind="lib" path="lib/lingpipe-2.2.0.jar" sourcepath="lib/src/lingpipe-3.3.0-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.alias-i.com/lingpipe/docs/api"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/looks-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/piccolo-1.2.jar" sourcepath="lib/src/piccolo-1.2.zip"/>
+	<classpathentry kind="lib" path="lib/piccolox-1.2.jar" sourcepath="lib/src/piccolo-1.2.zip"/>
+	<classpathentry kind="lib" path="lib/poi-3.6-20091214.jar" sourcepath="lib/src/poi-src-3.6-20091214.zip"/>
+	<classpathentry kind="lib" path="lib/PDFBox-0.7.2-log4j.jar"/>
+	<classpathentry kind="lib" path="lib/TeSeTool.jar"/>
+	
+	<classpathentry kind="lib" path="lib/voronoi-delaunay.jar"/>
+	<classpathentry kind="lib" path="lib/jl1.0.1.jar" sourcepath="lib/src/jl1.0.1-src.zip"/>
+	
+	
+	
+	<classpathentry kind="lib" path="lib/prefuse-beta-20071021.jar" sourcepath="lib/src/prefuse-beta-20071021.zip"/>
+	<classpathentry kind="lib" path="lib/prefuse-beta-20071021-demos.jar"/>
+	<classpathentry kind="lib" path="lib/jID3.jar" sourcepath="lib/src/jid3_src.zip"/>
+	<classpathentry kind="lib" path="lib/htmlparser1_6_20060610.jar" sourcepath="lib/src/htmlparser1_6_20060610-src.zip"/>
+	<classpathentry kind="lib" path="lib/flanagan_20100114.jar"/>
+	
+	<classpathentry kind="lib" path="lib/lucene-core-2.9.1.jar" sourcepath="lib/src/lucene-core-2.9.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="lib/swingx-1.6.jar" sourcepath="lib/src/swingx-1.6_src.zip"/>
+	<classpathentry kind="lib" path="lib/JSAP-2.1-2.jar" sourcepath="lib/src/JSAP-2.1-2-src.zip"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.0.jar" sourcepath="lib/src/commons-io-2.0-sources.jar"/>
+	<classpathentry kind="output" path="bin/core"/>
+</classpath>

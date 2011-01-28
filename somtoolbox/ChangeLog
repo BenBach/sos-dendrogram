@@ -1,0 +1,2088 @@
+2006-02-20 robert neumayer
+	fixed
+		build.xml
+			javadoc in dist
+			chmod of sources
+			changed build value to bin (protesting though)	
+			
+2006-02-20 robert neumayer
+	changed
+		build.xml
+			global classpath plus references
+			changed packaging target into dist
+			decoupled build and dist (dist may be nice for distributing current versions)
+			build is now the default target
+			build: builds the project, changes permissions for executables, 
+				creates somtoolbox.jar in base directory
+			dist: does javadoc call, copies all the relevant things to the dist directory,
+				and creates a .tar.gz file in the dist directory (for a current snapshot)
+			introduced clean target, cleans: build, javadoc, dist, somtoolbox.jar
+			somtoolbox is always referenced via the ant.project.name.property, 
+				as many other properties are stated at the beginning of the file now
+			the icons are now copied into the build dir and therefore part of the .jar file
+		file structure:
+			merged examples and doc into doc, is included in the distribution as well, put howtos into doc dir
+			somtoolbox.sh uses the somtoolbox.jar file, the build is not even included in the dist, 
+			so that one uses the jar as well	
+
+2006-01-11 rudolf mayer
+	added
+		project files for eclipse 
+			.classpath
+			.project
+			.settings/org.eclipse.jdt.core.prefs
+			.settings/org.eclipse.jdt.ui.prefs
+		docs & todo from thomas lidy
+			TODO_2.txt
+			SOMToolbox-Howto.txt
+			README.txt
+
+2006-01-11 rudolf mayer
+	* merging CVS with PlaySOM
+		changes to
+			src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java
+			src/at/ec3/somtoolbox/apps/viewer/SOMPane.java
+			src/at/ec3/somtoolbox/apps/viewer/PlaySOMPanel.java
+			src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java
+			src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java
+		
+		added
+			src/at/ec3/somtoolbox/apps/viewer/MyPCanvas.java
+			src/at/ec3/somtoolbox/apps/viewer/fileutils/MyM3UFileFilter.java
+			src/at/ec3/somtoolbox/apps/viewer/fileutils/PlayList.java
+			src/at/ec3/somtoolbox/apps/viewer/fileutils/PocketSOMFormatUtils.java
+			src/at/ec3/somtoolbox/apps/viewer/fileutils/MyJPGFileFilter.java
+			src/at/ec3/somtoolbox/apps/viewer/fileutils/MIMETypes.java
+			src/at/ec3/somtoolbox/apps/viewer/handlers/MyRectangleSelectionEventHandler.java
+			src/at/ec3/somtoolbox/apps/viewer/handlers/MyWheelZoomEventHandler.java
+			src/at/ec3/somtoolbox/apps/viewer/handlers/MyMapInputEventHandler.java
+			src/at/ec3/somtoolbox/apps/viewer/handlers/LineSelectionEventHandler.java
+			src/at/ec3/somtoolbox/apps/viewer/handlers/MyPanEventHandler.java
+			src/at/ec3/somtoolbox/apps/viewer/resources/icons/line.png
+			src/at/ec3/somtoolbox/apps/viewer/resources/icons/rectangle.png			
+
+2006-01-09 rudolf mayer
+    * merging CVS with menmonic (sparse) SOMs
+    	changes to
+    		somtoolbox.sh
+	    	somtoolbox.bat
+	    	
+    		src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java
+    		src/at/ec3/somtoolbox/input/SOMLibFormatInputReader.java
+    		src/at/ec3/somtoolbox/layers/GrowingLayer.java
+    		src/at/ec3/somtoolbox/layers/quality/QuantizationError.java
+    		src/at/ec3/somtoolbox/models/GrowingSOM.java
+    		src/at/ec3/somtoolbox/output/SOMLibMapOutputter.java
+    		src/at/ec3/somtoolbox/output/HTMLOutputter.java
+    		src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java
+    	added
+    		src/at/ec3/somtoolbox/input/MnemonicSOMLibFormatInputReader.java
+    		src/at/ec3/somtoolbox/layers/MnemonicGrowingLayer.java
+    		src/at/ec3/somtoolbox/layers/metrics/MnemonicSOMMetric.java
+    		src/at/ec3/somtoolbox/models/MnemonicSOM.java
+    		src/at/ec3/somtoolbox/util/mnemonic/MnemonicSOMGenerator.java
+    		src/at/ec3/somtoolbox/util/mnemonic/MapPanel.java    		    	
+
+2005-09-06 09:34  rn
+	* distribution: added ismir_rhythm demo files
+			updated buildfile
+			includes targets: 
+				ismir_genre_normalize
+				ismir_genre_train
+				ismir_genre_run
+				ismir_rhythm_normalize
+				ismir_rhythm_train
+				ismir_rhythm_run
+
+2005-08-02 15:55  rn
+	* distribution: fixed gui lock up
+			fixed tmp problems
+
+2005-07-10 01:14  rn
+
+	* distribution: fixed buildfile
+			added sample ant targets
+			added readme
+
+2005-02-18 09:59  mbach
+
+	* lib/: commons-discovery-0.2.jar, commons-logging-1.0.3.jar,
+	  commons-math-1.0.jar: initial revision, needed for data set
+	  generation
+
+2005-02-18 09:57  mbach
+
+	* doc/PROPERTIES: added quality measure options
+
+2005-02-07 21:55  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  models/GHSOM.java, models/GrowingSOM.java: adapted to more
+	  flexible growth control. some things might still be hardcoded, to
+	  be checked
+
+2005-02-07 21:53  mbach
+
+	* src/at/ec3/somtoolbox/layers/quality/SOMDistortion.java: added
+	  some functionality
+
+2005-02-07 21:52  mbach
+
+	* src/at/ec3/somtoolbox/properties/SOMProperties.java: added
+	  growthQualityMeasureName
+
+2005-02-07 21:52  mbach
+
+	* src/at/ec3/somtoolbox/properties/GHSOMProperties.java: added
+	  expandQualityMeasureName
+
+2005-02-07 21:51  mbach
+
+	* src/at/ec3/somtoolbox/util/DataSetGenerator.java: initial
+	  revision, working for ijcnn dataset
+
+2005-02-07 21:48  mbach
+
+	* lib/colt-1.1.0.jar: version 1.1.0 of colt library
+
+2005-01-25 14:39  mbachtest
+
+	* test: not needed
+
+2005-01-25 14:38  mbachtest
+
+	* test: test
+
+2005-01-20 16:14  mbach
+
+	* src/at/ec3/somtoolbox/: apps/viewer/GeneralUnitPNode.java,
+	  layers/GrowingLayer.java, layers/Layer.java, layers/Unit.java,
+	  layers/quality/AbstractQualityMeasure.java,
+	  layers/quality/QualityMeasure.java,
+	  layers/quality/QuantizationError.java, models/GHSOM.java,
+	  models/GrowingSOM.java, output/HTMLOutputter.java,
+	  output/SOMLibMapOutputter.java,
+	  visualization/QuantizationErrorVisualizer.java: changed quality
+	  measure implementation. qe and mqe nor longer hardcoded.  not
+	  happy regarding visualization, but no better idea yet
+
+2005-01-19 17:25  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  models/GHSOM.java: major rewrite of hierarchical growth, but
+	  still not finished
+
+2005-01-19 17:22  mbach
+
+	* src/at/ec3/somtoolbox/layers/Layer.java: added methods
+	  getMapDistance(...), getUnitForDatum(...)
+
+2005-01-19 17:20  mbach
+
+	* src/at/ec3/somtoolbox/layers/Unit.java: added methods
+	  setWeightVector(...) and addMappedInput(...)
+
+2005-01-19 17:19  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/QuantizationErrorVisualizer.java:
+	  no real change
+
+2005-01-19 17:19  mbach
+
+	* src/at/ec3/somtoolbox/output/HTMLOutputter.java: fixed null
+	  pointer exceptions when no data to highlight is given
+
+2005-01-19 17:18  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibSparseInputData.java: sorted
+	  members
+
+2005-01-19 17:17  mbach
+
+	* src/at/ec3/somtoolbox/data/InputData.java: added method
+	  getMeanVector()
+
+2005-01-19 17:16  mbach
+
+	* src/at/ec3/somtoolbox/layers/quality/:
+	  AbstractQualityMeasure.java, QualityMeasure.java,
+	  QualityMeasureNotFoundException.java, QuantizationError.java,
+	  SOMDistortion.java: initial revision, working
+
+2004-12-23 11:16  mbach
+
+	* build.xml: possibility to generate binary-only package or include
+	  source generated package can be built again (and again and again
+	  ...)
+
+2004-12-23 09:52  mbach
+
+	* ChangeLog: updated
+
+2004-12-23 09:50  mbach
+
+	* src/at/ec3/somtoolbox/input/SOMLibDataWinnerMapping.java: fixed
+	  javadoc
+
+2004-12-23 09:48  mbach
+
+	* src/at/ec3/somtoolbox/input/package.html: javadoc updated
+
+2004-12-23 09:45  mbach
+
+	* src/at/ec3/somtoolbox/: apps/AttendeeMapper.java,
+	  apps/ui/SOMViewer.java, apps/viewer/MapPNode.java,
+	  models/GrowingSOM.java, output/HTMLOutputter.java,
+	  output/SOMLibMapOutputter.java, output/TrajectoryOutputter.java,
+	  output/labeling/LabelSOM.java,
+	  visualization/SmoothedDataHistograms.java: adapted callers to
+	  catch exceptions when loading maps from file
+
+2004-12-23 09:40  mbach
+
+	* src/at/ec3/somtoolbox/input/: SOMLibDataWinnerMapping.java,
+	  SOMLibFormatInputReader.java: code clean up, javadoc comments,
+	  made openSOMLibFile static to remove duplicate code
+
+2004-12-22 17:19  mbach
+
+	* src/at/ec3/somtoolbox/input/: SOMInputReader.java,
+	  SOMLibDataWinnerMapping.java, SOMLibFileFormatException.java,
+	  SOMLibFormatInputReader.java: code clean up, javadoc comments
+
+2004-12-22 15:46  mbach
+
+	* src/at/ec3/somtoolbox/input/overview.html: removed due to wrong
+	  file name
+
+2004-12-22 15:41  mbach
+
+	* src/at/ec3/somtoolbox/input/: overview.html, package.html:
+	  initial revision
+
+2004-12-22 15:11  mbach
+
+	* src/at/ec3/somtoolbox/layers/metrics/: AbstractMetric.java,
+	  DistanceMetric.java, L1Metric.java, L2Metric.java: code clean up,
+	  javadoc comments
+
+2004-12-22 15:11  mbach
+
+	* src/at/ec3/somtoolbox/layers/metrics/package.html: initial
+	  revision
+
+2004-12-22 14:42  mbach
+
+	* src/at/ec3/somtoolbox/: models/GHSOM.java,
+	  models/GrowingSOM.java, apps/SDHTrainingSequenceGenerator.java:
+	  catch property exceptions
+
+2004-12-22 14:39  mbach
+
+	* src/at/ec3/somtoolbox/properties/: FileProperties.java,
+	  GHSOMProperties.java, PropertiesException.java,
+	  SOMProperties.java: added javadoc comments, throwing exception
+	  instead of exiting
+
+2004-12-22 12:45  mbach
+
+	* src/at/ec3/somtoolbox/properties/PropertiesException.java: intial
+	  revision
+
+2004-12-22 11:59  mbach
+
+	* src/at/ec3/somtoolbox/models/package.html: intial revision
+
+2004-12-22 11:54  mbach
+
+	* src/at/ec3/somtoolbox/models/: GHSOM.java, GrowingSOM.java,
+	  NetworkModel.java: polished javadoc comments
+
+2004-12-22 11:42  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: polished javadoc
+	  comments, changed visibility of one constructor
+
+2004-12-21 17:48  mbach
+
+	* ChangeLog: updated
+
+2004-12-21 17:47  mbach
+
+	* src/at/ec3/somtoolbox/apps/SDHTrainingSequenceGenerator.java,
+	  src/at/ec3/somtoolbox/data/InputData.java,
+	  src/at/ec3/somtoolbox/data/SOMLibSparseInputData.java,
+	  src/at/ec3/somtoolbox/layers/GrowingLayer.java,
+	  src/at/ec3/somtoolbox/layers/Unit.java,
+	  src/at/ec3/somtoolbox/models/GHSOM.java,
+	  src/at/ec3/somtoolbox/models/GrowingSOM.java,
+	  src/at/ec3/somtoolbox/output/HTMLOutputter.java,
+	  src/at/ec3/somtoolbox/output/SOMLibMapOutputter.java,
+	  src/at/ec3/somtoolbox/output/labeling/LabelSOM.java,
+	  src/at/ec3/somtoolbox/properties/FileProperties.java,
+	  src/at/ec3/somtoolbox/visualization/MappingDistortionVisualizer.java,
+	  src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java,
+	  doc/PROPERTIES: restructures normalization information, changed a
+	  lot of interfaces, VERY IMPORTANT: property file changed
+	  (normalization -> is Normalized)
+
+2004-12-21 15:15  mbach
+
+	* ChangeLog: updated
+
+2004-12-21 15:15  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  models/GHSOM.java, models/GrowingSOM.java,
+	  output/HTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  output/TrajectoryOutputter.java, output/labeling/LabelSOM.java,
+	  visualization/AbstractBackgroundImageVisualizer.java,
+	  visualization/ComponentPlanesVisualizer.java,
+	  visualization/MappingDistortionVisualizer.java,
+	  visualization/QuantizationErrorVisualizer.java,
+	  visualization/RhythmPatternsAttributeVisualizer.java,
+	  visualization/SmoothedDataHistograms.java,
+	  visualization/UMatrix.java,
+	  apps/SDHTrainingSequenceGenerator.java, apps/ui/SOMPane.java,
+	  apps/viewer/MapPNode.java: major interface change in GrowingSOM
+
+2004-12-21 14:48  mbach
+
+	* ChangeLog: updated
+
+2004-12-21 14:47  mbach
+
+	* src/at/ec3/somtoolbox/: apps/ui/SOMPane.java,
+	  apps/viewer/MapPNode.java, layers/GrowingLayer.java,
+	  models/GHSOM.java, models/GrowingSOM.java,
+	  output/HTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  output/TrajectoryOutputter.java,
+	  visualization/AbstractBackgroundImageVisualizer.java,
+	  visualization/MappingDistortionVisualizer.java,
+	  visualization/QuantizationErrorVisualizer.java,
+	  visualization/RhythmPatternsAttributeVisualizer.java,
+	  visualization/SmoothedDataHistograms.java,
+	  visualization/UMatrix.java: code cleanup in GrowingLayer and
+	  GrowingSOM
+
+2004-12-21 12:49  mbach
+
+	* src/: overview.html, at/ec3/somtoolbox/layers/package.html,
+	  at/ec3/somtoolbox/properties/package.html: added text to
+	  eliminate javadoc warnings
+
+2004-12-21 12:43  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: sorted members
+
+2004-12-21 12:42  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: fixed javadoc
+	  comment and renamed superUnit method to getSuperUnit
+
+2004-12-20 17:14  mbach
+
+	* src/at/ec3/somtoolbox/layers/package.html: initial revision
+
+2004-12-20 17:08  mbach
+
+	* src/at/ec3/somtoolbox/: SOMToolboxException.java,
+	  layers/LayerAccessException.java,
+	  layers/metrics/MetricException.java: fixed javadoc comments
+
+2004-12-20 16:58  mbach
+
+	* src/at/ec3/somtoolbox/layers/: LayerAccessException.java,
+	  TrainingInterruptionListener.java: fixed javadoc comments
+
+2004-12-20 16:30  mbach
+
+	* src/at/ec3/somtoolbox/layers/Layer.java: fixed javadoc comment,
+	  again
+
+2004-12-20 16:27  mbach
+
+	* src/at/ec3/somtoolbox/layers/Layer.java: fixed javadoc comment
+
+2004-12-20 16:26  mbach
+
+	* src/at/ec3/somtoolbox/: apps/ui/SOMPane.java,
+	  apps/viewer/MapPNode.java, layers/GrowingLayer.java,
+	  layers/Layer.java, layers/LayerAccessException.java,
+	  layers/Unit.java, layers/metrics/MetricException.java,
+	  models/GrowingSOM.java, output/HTMLOutputter.java,
+	  output/SOMLibMapOutputter.java, output/TrajectoryOutputter.java,
+	  visualization/QuantizationErrorVisualizer.java,
+	  visualization/RhythmPatternsAttributeVisualizer.java,
+	  visualization/UMatrix.java: added LayerAccessException, fixed
+	  exception handling in calling methods
+
+2004-12-20 15:37  mbach
+
+	* src/at/ec3/somtoolbox/: apps/SDHTrainingSequenceGenerator.java,
+	  layers/GrowingLayer.java, models/GrowingSOM.java: changed
+	  handling of training interruption listener
+
+2004-12-20 15:35  mbach
+
+	* src/at/ec3/somtoolbox/layers/Unit.java: code beautyfication and
+	  additional comments
+
+2004-12-20 15:34  mbach
+
+	* src/at/ec3/somtoolbox/SOMToolboxException.java: initial revision
+
+2004-12-15 11:18  mbach
+
+	* ChangeLog: updated for new release
+
+2004-12-15 11:17  mbach
+
+	* build.xml: removed unnecessary code
+
+2004-12-15 11:14  mbach
+
+	* ChangeLog: updated
+
+2004-12-15 11:10  mbach
+
+	* build.xml: fixed removed cvs checkout
+
+2004-12-15 10:47  mbach
+
+	* build.xml: fixed removed cvs checkout
+
+2004-12-15 10:46  mbach
+
+	* build.xml: removed cvs checkout
+
+2004-12-15 10:41  mbach
+
+	* build.xml: corrected copy task
+
+2004-12-15 10:33  mbach
+
+	* build.xml: added copy task for resources
+
+2004-12-15 10:02  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: better resource
+	  handling (icons)
+
+2004-12-15 10:01  mbach
+
+	* build.xml: restructured build process
+
+2004-12-15 09:28  mbach
+
+	* ChangeLog: added to cvs, not created by build script anymore
+
+2004-12-14 17:53  mbach
+
+	* lib/: JSAP_1.03a.jar, bicubicspline.jar, colt.jar,
+	  epsgraphics.jar, jcommon-0.9.5.jar, jfreechart-0.9.20.jar,
+	  looks-1.2.2.jar, piccolo.jar, piccolox.jar: intial revision.
+	  libraries needed for running the framework
+
+2004-12-14 17:21  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/resources/icons/:
+	  center3d-24.png, somviewer_logo-24.png: initial revision
+
+2004-12-01 17:05  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: fixed layout in
+	  navigation pane
+
+2004-12-01 17:05  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PieChartPNode.java: dont't
+	  paint when viewd by overview pane
+
+2004-12-01 17:04  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: added method,
+	  TODO: rename
+
+2004-12-01 17:03  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java: fixed
+	  pie chart issues
+
+2004-12-01 17:03  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: ClassLegendPane.java,
+	  NavigationPane.java: changed layout
+
+2004-12-01 16:50  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java:
+	  fixed minor display bugs for generic use of createImage() method
+
+2004-11-30 17:26  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java: show pie
+	  chart in detail level NO
+
+2004-11-30 17:25  mbach
+
+	* src/at/ec3/somtoolbox/layers/Label.java: no functional change
+
+2004-11-30 17:24  mbach
+
+	* src/at/ec3/somtoolbox/: models/GrowingSOM.java,
+	  layers/Layer.java, layers/GrowingLayer.java: added
+	  getComponentPlane(int)
+
+2004-11-30 17:24  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: removed
+	  redundant code for image drawing
+
+2004-11-30 17:23  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  removed import
+
+2004-11-30 17:23  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java:
+	  added generic method for image generation for subclasses
+
+2004-11-30 17:05  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/ComponentPlanesVisualizer.java:
+	  initial revision, works nicely :-)
+
+2004-11-29 22:55  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: fixed u-matrix,
+	  "bicubised" it
+
+2004-11-25 17:52  mbach
+
+	* src/at/ec3/somtoolbox/: apps/SDHTrainingSequenceGenerator.java,
+	  apps/ui/SOMPane.java, apps/viewer/GeneralUnitPNode.java,
+	  apps/viewer/UnitPNode.java, layers/GrowingLayer.java,
+	  layers/Unit.java, models/GHSOM.java, models/GrowingSOM.java,
+	  output/HTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  output/TrajectoryOutputter.java, output/labeling/LabelSOM.java,
+	  visualization/MappingDistortionVisualizer.java,
+	  visualization/RhythmPatternsAttributeVisualizer.java,
+	  visualization/SmoothedDataHistograms.java,
+	  visualization/UMatrix.java: changed code due to cleaned source in
+	  layer package
+
+2004-11-25 15:36  mbach
+
+	* src/at/ec3/somtoolbox/layers/Label.java: code beautyfication,
+	  javadoc comments complete
+
+2004-11-25 13:09  mbach
+
+	* src/at/ec3/somtoolbox/layers/MappedInputs.java: code
+	  beautyfication, javadoc comments complete
+
+2004-11-25 12:53  mbach
+
+	* src/at/ec3/somtoolbox/layers/Layer.java: code beautyfication,
+	  javadoc comments complete
+
+2004-11-25 12:26  mbach
+
+	* src/at/ec3/somtoolbox/layers/TrainingInterruptionListener.java:
+	  code beautyfication, javadoc comments complete
+
+2004-11-25 10:24  mbach
+
+	* src/at/ec3/somtoolbox/layers/Unit.java: code beautyfication,
+	  javadoc comments complete
+
+2004-11-23 16:05  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: map overview
+	  pane included, because it works correctly now PlaySOM pane
+	  removed (commented out)
+
+2004-11-23 16:04  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PlaySOMPanel.java: decoding of
+	  url-encoded strings
+
+2004-11-23 16:03  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: GeneralUnitPNode.java,
+	  SOMPane.java: selection is visible
+
+2004-11-23 09:11  mbach
+
+	* build.xml, somtoolbox-devel.sh: removed somtoolbox-devel.sh,
+	  minor changes in build.xml
+
+2004-11-23 09:01  mbach
+
+	* somtoolbox.sh: added runnables, fixed classpath (jar file)
+
+2004-11-23 08:52  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java: included
+	  data info file handling, less columns for data in high detail
+
+2004-11-23 08:51  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: included data
+	  info file handling, moved EventListener to SOMPane
+
+2004-11-23 08:50  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMPane.java: included data
+	  info file handling, moved EventListener from MapPNode, needs to
+	  be merged
+
+2004-11-23 08:48  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: included data
+	  info file handling
+
+2004-11-23 08:47  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java: more
+	  digits after comma in output file
+
+2004-11-23 08:46  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibDataInformation.java: initial
+	  revision, working
+
+2004-11-23 08:46  mbach
+
+	* src/at/ec3/somtoolbox/util/SOMLibDataInfoGenerator.java: initial
+	  revision, working for vector files generated with new indexer
+
+2004-11-19 14:37  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PlaySOMPanel.java: fixed issue
+	  in unitSelectionChanged, still buggy though
+
+2004-11-19 14:37  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: included
+	  playsom panel for testing purposes
+
+2004-11-19 14:36  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/MappingDistortionVisualizer.java:
+	  changed sparsity argument (hardcoded), still TODO
+
+2004-11-19 14:35  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  added important todo
+
+2004-11-19 14:35  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: heavy rewrite
+	  and cleanup
+
+2004-11-19 14:34  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputDatum.java,
+	  layers/GrowingLayer.java, layers/Unit.java,
+	  layers/metrics/AbstractMetric.java,
+	  output/labeling/LabelSOM.java: cleaned InputDatum and renamed
+	  methods
+
+2004-11-19 14:33  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java: removed
+	  some bugs
+
+2004-11-19 14:32  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibSparseInputData.java: removed
+	  getMatrix method
+
+2004-11-19 14:31  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: write data winner
+	  mapping file in any case
+
+2004-11-19 14:30  mbach
+
+	* src/at/ec3/somtoolbox/output/SOMLibMapOutputter.java: added main
+	  method for standalone use
+
+2004-11-19 13:39  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibZeroVectorRemover.java: fixed
+	  non-critical $TYPE $TYPE issue
+
+2004-11-19 12:03  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibInputData.java: removed from
+	  toolbox, colt library used instead, remember block read
+	  functionality!
+
+2004-11-19 12:02  mbach
+
+	* src/at/ec3/somtoolbox/data/InputDatum.java: removed import
+
+2004-11-19 12:01  mbach
+
+	* src/at/ec3/somtoolbox/data/InputDatum.java: removed unnecessary
+	  methods
+
+2004-11-19 11:42  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibZeroVectorRemover.java: initial
+	  revision, clean and working
+
+2004-11-18 14:22  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: new and better
+	  implementation using colt library, code not cleaned from old
+	  stuff
+
+2004-11-16 14:46  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibSparseInputData.java: added
+	  getMatrix() method for testing purposes
+
+2004-11-12 14:50  mbach
+
+	* src/at/ec3/somtoolbox/properties/package.html: no changes
+
+2004-11-09 18:24  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: no real change,
+	  imports cleaned
+
+2004-11-09 18:23  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMPane.java: no real change
+
+2004-11-09 18:23  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: animation to
+	  node added
+
+2004-11-09 18:22  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java: number
+	  format added, quality high implemented
+
+2004-11-09 18:22  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: write data winner
+	  mapping file in any case
+
+2004-11-09 08:55  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/UnitPNode.java: some changes,
+	  class will be thrown out in fabvor of GeneralPNode anyway
+
+2004-11-09 08:53  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/UnitSelectionListener.java:
+	  initial revision
+
+2004-11-09 08:52  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/ToolTipPNode.java: initial
+	  revision, working
+
+2004-11-09 08:52  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: no real change,
+	  just commented code for PlaySOM
+
+2004-11-09 08:51  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMPane.java: pan, zoom,
+	  selection functionality
+
+2004-11-09 08:50  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PlaySOMPanel.java: initial
+	  revision, provides basic list functionality, nothing else
+
+2004-11-09 08:45  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PieChartPNode.java: changed
+	  constructor
+
+2004-11-09 08:45  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: added tooltip
+	  funtionality, using GeneralUnitPNode
+
+2004-11-09 08:43  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/GeneralUnitPNode.java: initial
+	  revision, working, new implementation for text data, detailed
+	  level not ready yet
+
+2004-11-09 08:42  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  changed a bit, sparsity still not an option
+
+2004-11-09 08:37  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  added code for grayscale palette, 16 colors for publication
+	  screenshots
+
+2004-11-09 08:36  mbach
+
+	* src/at/ec3/somtoolbox/util/: UnitDescriptionMappingRewriter.java,
+	  VectorFileRewriter.java: changed some lines, no production class
+	  anyway, just a hack
+
+2004-11-09 08:35  mbach
+
+	* src/at/ec3/somtoolbox/output/SOMLibMapOutputter.java: changed
+	  method arguments (added numWinners), renamed units to winners
+
+2004-11-09 08:34  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: limited number of
+	  winners to be written to 300, changed method call
+
+2004-11-09 08:33  mbach
+
+	* src/at/ec3/somtoolbox/input/SOMLibDataWinnerMapping.java: renamed
+	  units to winners, minor improvements, progress writer
+
+2004-10-16 01:13  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  added functionality to read mappings from file, fixed
+	  interpolation
+
+2004-10-16 01:11  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  caoorected bottom right corner of interpolation
+
+2004-10-16 01:11  mbach
+
+	* src/at/ec3/somtoolbox/output/SOMLibMapOutputter.java: added data
+	  winner mapping file write functionality
+
+2004-10-16 01:10  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: added new flag -d
+
+2004-10-16 01:10  mbach
+
+	* src/at/ec3/somtoolbox/input/SOMLibDataWinnerMapping.java: initial
+	  revision, working, needs standalone functionality
+
+2004-10-16 01:09  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: fixed reading of
+	  additional files
+
+2004-10-14 00:01  mbach
+
+	* src/at/ec3/somtoolbox/visualization/:
+	  SmoothedDataHistograms.java, MappingDistortionVisualizer.java:
+	  adapted to scaling
+
+2004-10-14 00:01  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  added caching, adapted to scaling
+
+2004-10-13 23:59  mbach
+
+	* src/at/ec3/somtoolbox/util/: UnitDescriptionMappingRewriter.java,
+	  VectorFileRewriter.java: initial revision, just small tools
+
+2004-10-13 23:58  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: MapPNode.java,
+	  UnitPNode.java: new border color, zooming of
+	  backgroundimagevisualizer
+
+2004-10-12 14:31  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  no changes
+
+2004-10-12 10:48  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  tried out thesholding, deleted unnecessary method
+
+2004-10-11 08:20  mbach
+
+	* doc/PROPERTIES: added sparseData property
+
+2004-10-11 08:16  mbach
+
+	* src/at/ec3/somtoolbox/visualization/:
+	  MappingDistortionVisualizer.java, SmoothedDataHistograms.java:
+	  adapted to new data constructor, FIXME: sparsity hardcoded, NEEDS
+	  CHANGE
+
+2004-10-11 08:16  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/RhythmPatternsAttributeVisualizer.java:
+	  initial revision, working
+
+2004-10-11 08:15  mbach
+
+	* src/at/ec3/somtoolbox/properties/FileProperties.java: added
+	  sparseData property
+
+2004-10-11 08:14  mbach
+
+	* src/at/ec3/somtoolbox/output/: HTMLOutputter.java,
+	  labeling/LabelSOM.java: adapted to new data constructor call,
+	  made sparsity selectable
+
+2004-10-11 08:13  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibSparseInputData.java: made
+	  sparsity switchable
+
+2004-10-11 08:12  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: fixed usage
+	  message
+
+2004-10-11 08:12  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: fixed
+	  visualization initialization. returns null on failure
+
+2004-10-11 08:11  mbach
+
+	* src/at/ec3/somtoolbox/: apps/SDHTrainingSequenceGenerator.java,
+	  models/GHSOM.java, models/GrowingSOM.java: adapted to new data
+	  constructor call
+
+2004-10-07 07:53  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  added method for simple SDH Visualization
+
+2004-10-07 07:51  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: added
+	  trainWithInterruptions method
+
+2004-10-07 07:50  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: added
+	  trainWithInterruptions methods
+
+2004-10-07 07:50  mbach
+
+	* src/at/ec3/somtoolbox/layers/TrainingInterruptionListener.java:
+	  initial revision
+
+2004-10-07 07:49  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: fixed
+	  visualization selection
+
+2004-10-07 07:48  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMPane.java: no changes
+
+2004-10-07 07:48  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: fixed file
+	  dialog issues
+
+2004-10-07 07:47  mbach
+
+	* src/at/ec3/somtoolbox/apps/SDHTrainingSequenceGenerator.java:
+	  initial revision, working so far
+
+2004-09-21 17:52  mbach
+
+	* somtoolbox-devel.sh: initial revision for development only (using
+	  bin directory as source for class files)
+
+2004-09-21 17:49  mbach
+
+	* somtoolbox.sh, build.xml: fixed permissions of somtoolbox.sh
+
+2004-09-21 16:55  mbach
+
+	* somtoolbox.sh: this is now for the distributed version see
+	  somtoolbox-devel.sh
+
+2004-09-21 16:27  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: expParam=8,
+	  expParam2=5
+
+2004-09-21 13:02  mbach
+
+	* src/at/ec3/somtoolbox/properties/SOMProperties.java: larger
+	  neighborhood, new training series
+
+2004-09-20 18:20  mbach
+
+	* build.xml: added artwork file to copy
+
+2004-09-20 18:19  mbach
+
+	* rel2ver.sh, genvisprop.sh: initial revision
+
+2004-09-20 18:17  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: added toolbar,
+	  center button, and listener
+
+2004-09-20 18:17  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMPane.java: implemented
+	  center function
+
+2004-09-20 18:16  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: implemented
+	  getWidth() and getHeight()
+
+2004-09-20 18:16  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapOverviewPane.java: preferred
+	  size set
+
+2004-09-20 18:15  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: discarded data
+	  memury use output
+
+2004-09-20 12:39  mbach
+
+	* build.xml: minor change (artwork file copy)
+
+2004-09-20 12:35  mbach
+
+	* build.xml: generate visualization properties at build
+
+2004-09-20 12:34  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: jar file
+	  compatability, reads visualization plugin names from peoperties
+	  fiel that is built at build time instead of path structure
+
+2004-09-20 12:18  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: jar file
+	  compatability
+
+2004-09-20 12:14  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: jar file
+	  compatability
+
+2004-09-20 11:34  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: jar file
+	  compatability
+
+2004-09-20 11:27  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: jar file
+	  compatability
+
+2004-09-20 11:23  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: MapPNode.java,
+	  SOMViewer.java: jar file compatability
+
+2004-09-17 12:10  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: MapOverviewPane.java,
+	  SOMViewer.java: added map overview pane
+
+2004-09-16 22:40  mbach
+
+	* src/overview.html: initial revision, needs extension
+
+2004-09-16 22:31  mbach
+
+	* src/at/ec3/somtoolbox/properties/package.html: initial revision.
+	  needs to be extended
+
+2004-09-16 13:08  mbach
+
+	* somtoolbox.sh: corrected LabelSOM package call
+
+2004-09-15 17:34  mbach
+
+	* LICENSES-libraries: initial revision
+
+2004-09-15 17:32  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: changed PImage
+	  constructor call because of piccolo 1.1 update
+
+2004-09-14 12:27  mbach
+
+	* build.xml: added message
+
+2004-09-14 00:52  mbach
+
+	* build.xml: fails when revision is not given
+
+2004-09-13 22:46  mbach
+
+	* build.xml: added possibility for src directory deletion
+
+2004-09-13 22:38  mbach
+
+	* build.xml: added further funtionality, working very well
+
+2004-09-13 14:01  mbach
+
+	* build.xml: initial revision, working
+
+2004-09-13 11:39  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/MappingDistortionVisualizer.java:
+	  removed palette change
+
+2004-09-13 09:41  mbach
+
+	* TODO: added a coule of items
+
+2004-09-13 09:40  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  layers/Layer.java, models/GrowingSOM.java,
+	  output/HTMLOutputter.java, output/SOMLibMapOutputter.java:
+	  implemented layer revision info and use it in outputters
+
+2004-09-13 09:22  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: revision string
+	  test
+
+2004-09-10 11:32  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/MappingDistortionVisualizer.java:
+	  initial revision, working
+
+2004-09-10 10:59  mbach
+
+	* somtoolbox.sh: easier class calling
+
+2004-09-10 08:32  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibSparseInputData.java, layers/GrowingLayer.java,
+	  properties/SOMProperties.java: organized imports
+
+2004-09-09 16:21  mbach
+
+	* src/at/ec3/somtoolbox/: output/HTMLOutputter.java,
+	  output/SOMLibMapOutputter.java, output/TrajectoryOutputter.java,
+	  output/labeling/LabelSOM.java, output/labeling/Labeler.java,
+	  visualization/UMatrix.java,
+	  visualization/SmoothedDataHistograms.java: organized imports,
+	  minor changes
+
+2004-09-09 16:21  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: organized imports,
+	  use sparse data structure
+
+2004-09-09 16:21  mbach
+
+	* src/at/ec3/somtoolbox/: models/GHSOM.java,
+	  properties/FileProperties.java, properties/GHSOMProperties.java,
+	  properties/SOMProperties.java, util/JMultiLineToolTip.java,
+	  util/StdErrProgressWriter.java: organized imports
+
+2004-09-09 16:20  mbach
+
+	* src/at/ec3/somtoolbox/layers/metrics/: AbstractMetric.java,
+	  DistanceMetric.java, L1Metric.java, L2Metric.java: performance
+	  improvement using colt library
+
+2004-09-09 16:20  mbach
+
+	* src/at/ec3/somtoolbox/layers/Unit.java: normalization outsourced
+
+2004-09-09 16:19  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: performance
+	  improvement using colt library, training quality still
+	  quiestionable
+
+2004-09-09 16:18  mbach
+
+	* src/at/ec3/somtoolbox/input/SOMInputReader.java: no structural
+	  differences
+
+2004-09-09 16:17  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java:
+	  renamed method call
+
+2004-09-09 16:17  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibTemplateVector.java,
+	  input/SOMLibFormatInputReader.java, layers/Layer.java,
+	  layers/MappedInputs.java: organized imports
+
+2004-09-09 16:16  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibInputData.java: will be removed
+	  soon, DO NOT USE
+
+2004-09-09 16:15  mbach
+
+	* src/at/ec3/somtoolbox/data/: InputDatum.java, Normalization.java,
+	  SOMLibSparseInputData.java: performance improvement using colt
+	  library
+
+2004-09-09 16:11  mbach
+
+	* src/at/ec3/somtoolbox/: apps/AttendeeMapper.java,
+	  apps/ui/SOMPane.java, apps/ui/SOMViewer.java,
+	  apps/viewer/MapPNode.java, apps/viewer/NavigationPane.java,
+	  apps/viewer/SOMPane.java, apps/viewer/SOMViewer.java,
+	  apps/viewer/UnitPNode.java, data/InputData.java: organized
+	  imports
+
+2004-09-08 19:06  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputDatum.java,
+	  data/Normalization.java, data/SOMLibSparseInputData.java,
+	  layers/metrics/AbstractMetric.java,
+	  layers/metrics/DistanceMetric.java, layers/metrics/L1Metric.java,
+	  layers/metrics/L2Metric.java: restructuring, code does not work
+
+2004-09-08 15:16  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputDatum.java,
+	  data/SOMLibInputData.java, layers/GrowingLayer.java,
+	  models/GrowingSOM.java, output/HTMLOutputter.java: version before
+	  change to colt numeric library
+
+2004-08-04 21:02  mbach
+
+	* somtoolbox.sh, doc/PROPERTIES: *** keyword substitution change
+	  ***
+
+2004-08-04 20:53  mbach
+
+	* TODO: initial revision
+
+2004-08-04 20:50  mbach
+
+	* somtoolbox.sh: better classpath construction
+
+2004-08-04 20:49  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/ClassLegendPane.java: played
+	  around with column widths
+
+2004-08-04 20:47  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/NavigationPane.java: changed
+	  LayoutManager
+
+2004-08-04 20:47  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PieChartPNode.java: added
+	  method setColor
+
+2004-08-04 20:47  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: changed
+	  LayoutManager for VisualizationControlPanel
+
+2004-08-04 20:46  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: UnitPNode.java, SOMPane.java,
+	  MapPNode.java: added method setClassColor
+
+2004-08-04 20:46  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: learning!!!
+
+2004-08-04 20:45  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java:
+	  increased paletteSize
+
+2004-08-04 20:45  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  using bi-cubic splines, pretty cool ;-)
+
+2004-07-27 21:04  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: uses new
+	  StdErrProgressWriter, heavy rewriting of training process, still
+	  not satisfied with results :-(
+
+2004-07-27 21:03  mbach
+
+	* src/at/ec3/somtoolbox/layers/Unit.java: new method
+	  initWeightVectorBySample(InputDatum datum)
+
+2004-07-27 21:01  mbach
+
+	* src/at/ec3/somtoolbox/util/: ProgressListener.java,
+	  StdErrProgressWriter.java: initial revision, working well
+
+2004-07-27 21:01  mbach
+
+	* src/at/ec3/somtoolbox/:
+	  visualization/SmoothedDataHistograms.java,
+	  output/SOMLibMapOutputter.java, models/GrowingSOM.java,
+	  input/SOMLibFormatInputReader.java, data/SOMLibInputData.java,
+	  data/SOMLibTemplateVector.java: uses new StdErrProgressWriter
+
+2004-07-26 20:56  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: MapPNode.java,
+	  SOMViewer.java, UnitPNode.java: fixed get ClassColor bug
+
+2004-07-26 18:04  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: added map file
+	  name to window title
+
+2004-07-26 18:03  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: made UNIT_WIDTH
+	  and UNIT_HEIGHT final, might be changed again in the future
+
+2004-07-26 18:02  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: new learning rate
+	  and neighborhood
+
+2004-07-26 18:02  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/QuantizationErrorVisualizer.java:
+	  ignore 0 values if no data are mapped onto a unit
+
+2004-07-26 13:42  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  two new varieties, Weighted SDH (with and without normalization)
+
+2004-07-26 13:41  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java:
+	  added comment
+
+2004-07-26 13:41  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  models/GrowingSOM.java: added method getWinnersAndDistances
+
+2004-07-26 13:40  mbach
+
+	* src/at/ec3/somtoolbox/: input/SOMLibFormatInputReader.java,
+	  output/SOMLibMapOutputter.java: improved progress output
+
+2004-07-22 12:44  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibInputData.java,
+	  data/SOMLibTemplateVector.java,
+	  input/SOMLibFormatInputReader.java, layers/GrowingLayer.java,
+	  models/GrowingSOM.java, output/SOMLibMapOutputter.java,
+	  visualization/SmoothedDataHistograms.java: updated progrss output
+
+2004-07-21 17:49  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  visualization/SmoothedDataHistograms.java: minor changes
+
+2004-07-21 16:34  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/ClassLegendPane.java: new color
+	  representation, support for selection
+
+2004-07-21 16:33  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/NavigationPane.java: removed
+	  stuff (preferredSize)
+
+2004-07-21 16:33  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PieChartPNode.java: added
+	  method getValues
+
+2004-07-21 16:32  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: SOMPane.java, MapPNode.java:
+	  added method updateClassSelection
+
+2004-07-21 16:32  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: new look and
+	  feel, navPane issues, updateVisualization no longer in separate
+	  thread (might change in the future)
+
+2004-07-21 16:31  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/UnitPNode.java: support for
+	  class selection
+
+2004-07-21 16:30  mbach
+
+	* src/at/ec3/somtoolbox/: models/GrowingSOM.java,
+	  layers/GrowingLayer.java, data/SOMLibInputData.java: better
+	  progress output
+
+2004-07-21 16:28  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  minor changes, progress output to stdout
+
+2004-07-21 09:38  mbach
+
+	* src/at/ec3/somtoolbox/: apps/viewer/ClassLegendPane.java,
+	  apps/viewer/MapPNode.java, apps/viewer/SOMPane.java,
+	  apps/viewer/SOMViewer.java,
+	  visualization/AbstractBackgroundImageVisualizer.java,
+	  visualization/BackgroundImageVisualizer.java,
+	  visualization/QuantizationErrorVisualizer.java,
+	  visualization/SmoothedDataHistograms.java,
+	  visualization/UMatrix.java,
+	  visualization/VisualizationUpdateListener.java: updated
+	  infrastructure for an updatelistener that reacts to visualization
+	  parameter changes
+
+2004-07-20 10:57  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: MapPNode.java, SOMPane.java:
+	  changed retrun value of setVisualization to boolean
+
+2004-07-20 10:56  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: no real change,
+	  return value of setVisualization should be handled
+
+2004-07-20 10:55  mbach
+
+	* src/at/ec3/somtoolbox/visualization/:
+	  AbstractBackgroundImageVisualizer.java,
+	  BackgroundImageVisualizer.java: new interface for additional
+	  files that are needed for creating the visualization
+
+2004-07-20 10:55  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  adapted to new interface
+
+2004-07-16 13:08  mbach
+
+	* src/at/ec3/somtoolbox/visualization/SmoothedDataHistograms.java:
+	  initial revision, working, data file names hard-coded
+
+2004-07-16 13:07  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: fully working
+	  now, redundant code present
+
+2004-07-16 13:07  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java:
+	  added reversePalette method
+
+2004-07-16 13:05  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/QuantizationErrorVisualizer.java:
+	  corrected rectangle size
+
+2004-07-16 10:53  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: changed to
+	  median
+
+2004-07-15 15:37  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: new
+	  implementation of "classic" algorithm, detected fault in old
+	  implementation
+
+2004-07-15 15:31  mbach
+
+	*
+	  src/at/ec3/somtoolbox/visualization/AbstractBackgroundImageVisualizer.java:
+	  changed default palette
+
+2004-07-15 11:36  mbach
+
+	* src/at/ec3/somtoolbox/visualization/:
+	  AbstractBackgroundImageVisualizer.java,
+	  BackgroundImageVisualizer.java, QuantizationErrorVisualizer.java,
+	  UMatrix.java: created default palette in abstract superclass
+
+2004-07-14 18:09  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: changed
+	  palette, tried out logarithmic scale
+
+2004-07-14 18:08  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: changed expParam2
+	  for a flatter curve, "different" gaussian
+
+2004-07-13 19:35  mbach
+
+	* src/at/ec3/somtoolbox/: apps/viewer/ClassLegendPane.java,
+	  apps/viewer/MapPNode.java, apps/viewer/SOMPane.java,
+	  apps/viewer/SOMViewer.java, apps/viewer/UnitPNode.java,
+	  data/Normalization.java, layers/GrowingLayer.java,
+	  layers/MappedInputs.java, layers/Unit.java,
+	  models/GrowingSOM.java, util/SwingWorker.java: major performance
+	  improvements, SOMViewer improvements, class color legend
+
+2004-07-08 21:34  mbach
+
+	* src/at/ec3/somtoolbox/layers/GrowingLayer.java: different
+	  iteration output
+
+2004-07-08 21:33  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: MapPNode.java, SOMPane.java,
+	  SOMViewer.java, UnitPNode.java: incorporated class information,
+	  testing by now
+
+2004-07-08 21:32  mbach
+
+	* src/at/ec3/somtoolbox/data/: InputDatum.java,
+	  SOMLibTemplateVector.java: no real change
+
+2004-07-08 21:31  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibInputData.java: added classInfo
+	  field, not used by now
+
+2004-07-08 21:31  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibClassInformation.java: initial
+	  revision, working
+
+2004-07-08 17:51  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/PieChartPNode.java: initial
+	  revision. working
+
+2004-07-06 12:38  mbach
+
+	* doc/PROPERTIES, somtoolbox.sh: initial revision
+
+2004-07-06 12:05  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: added newlines
+	  to description
+
+2004-07-06 12:04  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: changed menu
+	  items for visualizations to multi lined tooltip ones
+
+2004-07-06 12:03  mbach
+
+	* src/at/ec3/somtoolbox/util/: JMultiLineRadioButtonMenuItem.java,
+	  JMultiLineToolTip.java, MultiLineToolTipUI.java: initial
+	  revision, for other components look at
+	  JMultiLineRadioButtonMenuItem. Just override one method and the
+	  constructors.
+
+2004-07-05 15:52  mbach
+
+	* src/at/ec3/somtoolbox/visualization/:
+	  QuantizationErrorVisualizer.java, UMatrix.java: changed
+	  description
+
+2004-07-05 15:52  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/SOMViewer.java: added tooltip
+	  for visualizations
+
+2004-07-05 15:50  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/MapPNode.java: automated
+	  loading of visualizations
+
+2004-07-02 15:44  mbach
+
+	* src/at/ec3/somtoolbox/: apps/viewer/MapPNode.java,
+	  visualization/AbstractBackgroundImageVisualizer.java,
+	  visualization/QuantizationErrorVisualizer.java: minor
+	  improvemenets, qe/mqe visualization implemented
+
+2004-07-01 20:07  mbach
+
+	* src/at/ec3/somtoolbox/visualization/:
+	  AbstractBackgroundImageVisualizer.java, UMatrix.java: added
+	  abstract visualization class for standard operations
+
+2004-06-30 19:35  mbach
+
+	* src/at/ec3/somtoolbox/: apps/viewer/MapPNode.java,
+	  apps/viewer/SOMPane.java, apps/viewer/SOMViewer.java,
+	  models/GrowingSOM.java,
+	  visualization/BackgroundImageVisualizer.java,
+	  visualization/UMatrix.java: visualization switching in SOMViewer
+	  works
+
+2004-06-30 11:22  mbach
+
+	* src/at/ec3/somtoolbox/: apps/AttendeeMapper.java,
+	  apps/ui/SOMViewer.java, apps/viewer/MapPNode.java,
+	  apps/viewer/SOMPane.java, apps/viewer/SOMViewer.java,
+	  input/SOMInputReader.java, input/SOMLibFormatInputReader.java,
+	  models/GHSOM.java, models/GrowingSOM.java,
+	  output/HTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  output/TrajectoryOutputter.java, output/labeling/LabelSOM.java,
+	  visualization/UMatrix.java: refactored whole package to read
+	  metric information from map description file
+
+2004-06-29 18:42  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: added
+	  getDirectNeighbors(Unit u) method
+
+2004-06-29 18:41  mbach
+
+	* src/at/ec3/somtoolbox/visualization/UMatrix.java: initial
+	  revision, works quite well :-)
+
+2004-06-29 18:40  mbach
+
+	* src/at/ec3/somtoolbox/apps/: AttendeeMapper.java,
+	  viewer/MapPNode.java, viewer/SOMPane.java, viewer/SOMViewer.java,
+	  viewer/UnitPNode.java: added FIXME
+
+2004-06-28 20:58  mbach
+
+	* src/at/ec3/somtoolbox/apps/viewer/: NavigationPane.java,
+	  SOMPane.java, SOMViewer.java: initial revision, playeing around
+	  with piccolo
+
+2004-06-28 16:14  mbach
+
+	* src/at/ec3/somtoolbox/apps/ui/: SOMPane.java, SOMViewer.java:
+	  last revision before complete rewrite, piccolo framework to be
+	  used
+
+2004-06-22 14:53  mbach
+
+	* src/at/ec3/somtoolbox/output/TrajectoryOutputter.java:
+	  performance improvement ;-)
+
+2004-06-22 14:53  mbach
+
+	* src/at/ec3/somtoolbox/apps/ui/: SOMPane.java, SOMViewer.java:
+	  initial revision, basic functionality (zooming), code needs to be
+	  heavily revised
+
+2004-06-21 14:27  mbach
+
+	* src/at/ec3/somtoolbox/output/TrajectoryOutputter.java: finetuning
+
+2004-06-17 18:43  mbach
+
+	* src/at/ec3/somtoolbox/output/TrajectoryOutputter.java: colorful
+	  output :-)
+
+2004-06-17 18:42  mbach
+
+	* src/at/ec3/somtoolbox/output/HTMLOutputter.java: resolved null
+	  pointer exception
+
+2004-06-09 19:44  mbach
+
+	* src/at/ec3/somtoolbox/apps/AttendeeMapper.java: nice command
+	  line, wokrs well
+
+2004-06-09 19:41  mbach
+
+	* src/at/ec3/somtoolbox/output/HTMLOutputter.java: downlinks are
+	  also marked
+
+2004-06-09 19:40  mbach
+
+	* src/at/ec3/somtoolbox/output/TrajectoryOutputter.java: works
+	  nicely, todo: comments, logging
+
+2004-06-09 12:03  mbach
+
+	* src/at/ec3/somtoolbox/output/TrajectoryOutputter.java: initial
+	  revision
+
+2004-06-08 20:31  mbach
+
+	* src/at/ec3/somtoolbox/apps/AttendeeMapper.java: works, niche
+	  command line tbd
+
+2004-06-08 20:30  mbach
+
+	* src/at/ec3/somtoolbox/output/HTMLOutputter.java: further
+	  modularization, added highlighting functionality for single data
+	  items
+
+2004-06-08 14:30  mbach
+
+	* src/at/ec3/somtoolbox/output/HTMLOutputter.java: modularized
+	  structure
+
+2004-06-08 13:50  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  layers/MappedInputs.java, layers/Unit.java,
+	  output/HTMLOutputter.java, models/GrowingSOM.java: return to
+	  eclipes M8 again
+
+2004-06-08 11:43  mbach
+
+	* src/at/ec3/somtoolbox/: apps/AttendeeMapper.java,
+	  layers/GrowingLayer.java, models/GHSOM.java,
+	  models/GrowingSOM.java, output/SOMHTMLOutputter.java,
+	  output/labeling/LabelSOM.java: changed SOMHTMLOutputter to
+	  HTMLOutputter for the sake of a shorter name. updated necessary
+	  references
+
+2004-06-08 11:38  mbach
+
+	* src/at/ec3/somtoolbox/output/HTMLOutputter.java: changed name
+
+2004-06-08 09:39  mbach
+
+	* src/at/ec3/somtoolbox/: apps/AttendeeMapper.java,
+	  layers/GrowingLayer.java, layers/Unit.java, models/GHSOM.java,
+	  models/GrowingSOM.java: step back to older eclipse version
+
+2004-06-04 12:55  mbach
+
+	* src/at/ec3/somtoolbox/: apps/AttendeeMapper.java,
+	  input/SOMInputReader.java, layers/GrowingLayer.java,
+	  models/GHSOM.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java: mapping and clearing of data are
+	  recursive now. everything works fine.  close to new release :-)
+	  weekend ...
+
+2004-06-03 20:03  mbach
+
+	* src/at/ec3/somtoolbox/: input/SOMInputReader.java,
+	  input/SOMLibFormatInputReader.java, layers/GrowingLayer.java,
+	  models/GrowingSOM.java, output/SOMHTMLOutputter.java,
+	  output/SOMLibMapOutputter.java, output/labeling/LabelSOM.java:
+	  ghsom read works, recursive labeling and html output also :-))
+
+2004-06-03 14:20  mbach
+
+	* src/at/ec3/somtoolbox/output/: SOMHTMLOutputter.java,
+	  labeling/LabelSOM.java: labeler standalone works, synchronized
+	  with SOMHTMLOutputter usage, GHSOM read tbd
+
+2004-06-02 20:49  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibInputData.java,
+	  input/SOMInputReader.java, input/SOMLibFormatInputReader.java,
+	  layers/GrowingLayer.java, layers/Unit.java,
+	  layers/metrics/MetricException.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java:
+	  SOMHTMLOutputter refactored in big style ;-) flexible usage.
+	  GHSOM read tbd
+
+2004-06-01 16:17  mbach
+
+	* src/at/ec3/somtoolbox/: input/SOMInputReader.java,
+	  input/SOMLibFormatInputReader.java, layers/GrowingLayer.java,
+	  models/GHSOM.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java: new SOM input interface and
+	  SOMLibFormat class for modular read of trained SOMs
+
+2004-06-01 13:10  mbach
+
+	* src/at/ec3/somtoolbox/input/: SOMInputReader.java,
+	  SOMLibFormatInputReader.java: initial revision
+
+2004-05-28 17:26  mbach
+
+	* src/at/ec3/somtoolbox/: models/GHSOM.java,
+	  output/SOMHTMLOutputter.java: even nicer html output :-)
+
+2004-05-26 18:48  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  layers/Layer.java, layers/Unit.java, models/GHSOM.java,
+	  models/GrowingSOM.java, output/SOMHTMLOutputter.java,
+	  output/SOMLibMapOutputter.java,
+	  output/labeling/AbstractLabeler.java,
+	  output/labeling/LabelSOM.java, output/labeling/Labeler.java: neat
+	  html output, read ghsom from file still missing, everything else
+	  works fine
+
+2004-05-26 10:17  mbach
+
+	* src/at/ec3/somtoolbox/output/labeling/AbstractLabeler.java:
+	  initial revision
+
+2004-05-25 19:47  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibInputData.java, layers/GrowingLayer.java,
+	  layers/Unit.java, models/GHSOM.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  properties/GHSOMProperties.java: GHSOM works, GHSOM read from
+	  file tbd
+
+2004-05-19 13:50  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibInputData.java: removed todos
+
+2004-05-19 13:48  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibInputData.java, layers/GrowingLayer.java,
+	  models/GrowingSOM.java, properties/FileProperties.java: block
+	  change working
+
+2004-05-18 20:52  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibInputData.java, data/SOMLibTemplateVector.java,
+	  layers/GrowingLayer.java, layers/Label.java, layers/Labels.java,
+	  layers/Unit.java, models/GHSOM.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  output/labeling/LabelSOM.java, output/labeling/Labeler.java,
+	  properties/FileProperties.java, properties/SOMProperties.java:
+	  mapping cache removed, GrowingSOM working, LabelSOM working
+
+2004-05-18 16:04  mbach
+
+	* src/at/ec3/somtoolbox/properties/GHSOMProperties.java: initial
+	  revision
+
+2004-05-18 15:56  mbach
+
+	* src/at/ec3/somtoolbox/models/GHSOM.java: initial revision
+
+2004-05-18 11:16  mbach
+
+	* src/at/ec3/somtoolbox/data/TemplateVector.java: initial revision
+
+2004-05-17 10:18  mbach
+
+	* src/at/ec3/somtoolbox/layers/Label.java: initial revision,
+	  renamed from Labels
+
+2004-05-14 12:54  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibInputData.java,
+	  data/SOMLibTemplateVector.java, layers/GrowingLayer.java,
+	  layers/Unit.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  output/labeling/LabelSOM.java, output/labeling/Labeler.java: may
+	  14th, weekend starting, labeling todo
+
+2004-05-14 12:19  mbach
+
+	* src/at/ec3/somtoolbox/output/labeling/Labeler.java: initial
+	  revision
+
+2004-05-14 12:08  mbach
+
+	* src/at/ec3/somtoolbox/layers/Labels.java: initial revision
+
+2004-05-14 10:56  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java:
+	  removed long options
+
+2004-05-14 10:51  mbach
+
+	* src/at/ec3/somtoolbox/layers/Unit.java: changed to use
+	  MappedInputs class
+
+2004-05-14 10:49  mbach
+
+	* src/at/ec3/somtoolbox/layers/MappedInputs.java: initial revision,
+	  working as expected
+
+2004-05-13 22:41  mbach
+
+	* src/at/ec3/somtoolbox/output/labeling/LabelSOM.java: initial
+	  revision
+
+2004-05-06 20:25  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibInputData.java,
+	  data/SOMLibVectorNormalization.java, layers/GrowingLayer.java,
+	  layers/metrics/AbstractMetric.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  properties/SOMProperties.java: gsom working, niche command line
+	  parsing
+
+2004-05-06 10:09  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  output/SOMHTMLOutputter.java: growing works
+
+2004-05-05 20:25  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibInputData.java, layers/GrowingLayer.java,
+	  layers/Unit.java, layers/metrics/AbstractMetric.java,
+	  models/GrowingSOM.java, output/SOMHTMLOutputter.java,
+	  properties/SOMProperties.java: nearly growing ;-)
+
+2004-05-04 15:18  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  layers/Unit.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java:
+	  basic functionality and somlib and html output
+
+2004-04-30 23:45  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibInputData.java, layers/GrowingLayer.java,
+	  layers/Layer.java, layers/Unit.java, models/GrowingSOM.java,
+	  output/SOMHTMLOutputter.java, output/SOMLibMapOutputter.java,
+	  properties/FileProperties.java: basic output functionality as of
+	  30 april, 2004
+
+2004-03-18 14:07  mbach
+
+	* src/at/ec3/somtoolbox/: layers/GrowingLayer.java,
+	  models/GrowingSOM.java, models/NetworkModel.java,
+	  output/SOMLibMapOutputter.java: thursday ... beginning of weekend
+	  :-)
+
+2004-03-18 14:07  mbach
+
+	* src/at/ec3/somtoolbox/output/SOMHTMLOutputter.java: initial
+	  revision
+
+2004-03-18 13:52  mbach
+
+	* src/at/ec3/somtoolbox/output/SOMLibMapOutputter.java: initial
+	  revision, working
+
+2004-03-18 13:49  mbach
+
+	* src/at/ec3/somtoolbox/data/: SOMLibVectorNormalization.java,
+	  SOMLibInputData.java: added $YDIM read
+
+2004-03-17 14:03  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibInputData.java,
+	  layers/GrowingLayer.java, models/GrowingSOM.java,
+	  properties/FileProperties.java, properties/SOMProperties.java:
+	  wednesday afternoon
+
+2004-03-16 19:50  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/SOMLibInputData.java, layers/GrowingLayer.java,
+	  layers/metrics/L1Metric.java, layers/metrics/L2Metric.java,
+	  properties/FileProperties.java, properties/SOMProperties.java:
+	  tuesday night's work
+
+2004-03-16 18:00  mbach
+
+	* src/at/ec3/somtoolbox/data/: Normalization.java,
+	  SOMLibInputData.java: tuesday evening
+
+2004-03-16 17:48  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java: better
+	  usage message, more flexibility for future extensions regarding
+	  command line invocation
+
+2004-03-16 17:20  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java:
+	  working as intended, javadoc comments written
+
+2004-03-16 16:43  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java:
+	  modularized, working
+
+2004-03-16 16:29  mbach
+
+	* src/at/ec3/somtoolbox/data/SOMLibVectorNormalization.java:
+	  initial revision, working
+
+2004-03-15 23:18  mbach
+
+	* src/at/ec3/somtoolbox/: data/SOMLibInputData.java,
+	  layers/GrowingLayer.java, layers/metrics/AbstractMetric.java,
+	  layers/metrics/DistanceMetric.java, layers/metrics/L1Metric.java,
+	  layers/metrics/L2Metric.java,
+	  layers/metrics/MetricException.java, models/GrowingSOM.java,
+	  properties/SOMProperties.java: monday night's work
+
+2004-03-15 16:50  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputData.java,
+	  data/Normalization.java, data/SOMLibInputData.java,
+	  layers/GrowingLayer.java, layers/Layer.java, layers/Unit.java,
+	  layers/metrics/L1Metric.java, layers/metrics/L2Metric.java,
+	  models/GrowingSOM.java, properties/FileProperties.java,
+	  properties/SOMProperties.java: end of monday's work ...
+
+2004-03-15 14:14  mbach
+
+	* src/at/ec3/somtoolbox/data/InputDatum.java: removes unnecessary
+	  setters
+
+2004-03-15 14:12  mbach
+
+	* src/at/ec3/somtoolbox/data/Normalization.java: initial revision
+
+2004-03-15 13:08  mbach
+
+	* src/at/ec3/somtoolbox/properties/: FileProperties.java,
+	  SOMProperties.java: initial revision, should be working
+
+2004-03-13 22:39  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: nothing
+
+2004-03-13 22:36  mbach
+
+	* src/at/ec3/somtoolbox/: data/InputDatum.java,
+	  layers/GrowingLayer.java, layers/Layer.java,
+	  layers/metrics/AbstractMetric.java,
+	  layers/metrics/DistanceMetric.java, layers/metrics/L1Metric.java,
+	  layers/metrics/L2Metric.java: initial revision
+
+2004-03-13 00:06  mbach
+
+	* src/at/ec3/somtoolbox/models/GrowingSOM.java: initial revision
+
