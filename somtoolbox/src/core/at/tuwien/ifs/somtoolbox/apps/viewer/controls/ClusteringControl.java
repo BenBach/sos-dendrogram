@@ -30,21 +30,26 @@ import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Tree;
+import edu.uci.ics.jung.graph.util.Context;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.GraphMouseListener;
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
-import org.apache.commons.collections15.Predicate;
+import org.apache.commons.collections15.PredicateUtils;
+import org.apache.commons.collections15.Transformer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -540,22 +545,47 @@ public class ClusteringControl extends AbstractViewerControl {
         buildJUNGTree(clusterTree, node, new AtomicInteger(0));
 
         TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
-                30, 30);
-        VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer(clusterLayout);
-        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line());
-        vv.getRenderContext().setEdgeArrowPredicate(new Predicate() {
+                30, 100);
+
+        final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(clusterLayout);
+        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
+        vv.getRenderContext().setEdgeArrowPredicate(
+                PredicateUtils.<Context<Graph<ClusterNode, Integer>, Integer>>falsePredicate());
+        vv.getRenderContext().setVertexLabelTransformer(new Transformer<ClusterNode, String>() {
             @Override
-            public boolean evaluate(Object o) {
-                return false;
+            public String transform(ClusterNode clusterNode) {
+                return "" + clusterNode.getLevel();
             }
         });
-        /*vv.getRenderContext().setVertexLabelTransformer(new EllipseVertexShapeTransformer
-                (new ConstantTransformer(5.0d), new ConstantTransformer(5.0d)));*/
+
         GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
 
+        vv2.setPreferredSize(new Dimension(dendogramPanel.getParent().getWidth(), 200));
         vv2.setVisible(true);
+
+        DefaultModalGraphMouse<ClusterNode, Integer> graphMouse = new DefaultModalGraphMouse<ClusterNode, Integer>();
+        vv.setGraphMouse(graphMouse);
+        graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
+
+        vv.addGraphMouseListener(new GraphMouseListener<ClusterNode>() {
+            @Override
+            public void graphClicked(ClusterNode clusterNode, MouseEvent me) {
+                numClusters = clusterNode.getLevel();
+                redrawClustering();
+            }
+
+            @Override
+            public void graphPressed(ClusterNode clusterNode, MouseEvent me) {
+            }
+
+            @Override
+            public void graphReleased(ClusterNode clusterNode, MouseEvent me) {
+            }
+        });
+
         dendogramPanel.removeAll();
         dendogramPanel.add(vv2);
+
         getContentPane().validate();
     }
 
