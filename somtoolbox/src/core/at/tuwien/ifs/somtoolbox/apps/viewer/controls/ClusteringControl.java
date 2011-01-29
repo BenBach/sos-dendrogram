@@ -17,30 +17,12 @@
  */
 package at.tuwien.ifs.somtoolbox.apps.viewer.controls;
 
-import at.tuwien.ifs.commons.gui.controls.TitledCollapsiblePanel;
-import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
-import at.tuwien.ifs.somtoolbox.apps.viewer.SOMPane;
-import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.ExportUtils;
-import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.LabelXmlUtils;
-import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
-import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
-import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
-import at.tuwien.ifs.somtoolbox.util.UiUtils;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
-import edu.uci.ics.jung.algorithms.layout.TreeLayout;
-import edu.uci.ics.jung.graph.DelegateTree;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.Tree;
-import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PObjectOutputStream;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -56,9 +38,46 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import edu.uci.ics.jung.algorithms.layout.TreeLayout;
+import edu.uci.ics.jung.graph.DelegateTree;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.Tree;
+import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.util.PObjectOutputStream;
+
+import at.tuwien.ifs.commons.gui.controls.TitledCollapsiblePanel;
+import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
+import at.tuwien.ifs.somtoolbox.apps.viewer.SOMPane;
+import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.ExportUtils;
+import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.LabelXmlUtils;
+import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
+import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
+import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
+import at.tuwien.ifs.somtoolbox.util.UiUtils;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterElementsStorage;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterNode;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringTree;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.KMeans;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.KMeansTreeBuilder;
+
 /**
  * The control panel for the clustering functionality.
- *
+ * 
  * @author Angela Roiger
  * @author Rudolf Mayer
  * @version $Id: ClusteringControl.java 3970 2010-12-15 13:17:59Z mayer $
@@ -114,16 +133,20 @@ public class ClusteringControl extends AbstractViewerControl {
     }
 
     private void buildJUNGTree(Tree<ClusterNode, Integer> tree, ClusterNode curNode, AtomicInteger curEdge) {
-        if(curNode == null) return;
+        if (curNode == null) {
+            return;
+        }
 
         ClusterNode c1 = curNode.getChild1();
         ClusterNode c2 = curNode.getChild2();
 
-        if (c1 != null)
+        if (c1 != null) {
             tree.addEdge(curEdge.incrementAndGet(), curNode, c1);
+        }
 
-        if (c2 != null)
+        if (c2 != null) {
             tree.addEdge(curEdge.incrementAndGet(), curNode, c2);
+        }
 
         buildJUNGTree(tree, c1, curEdge);
         buildJUNGTree(tree, c2, curEdge);
@@ -181,30 +204,28 @@ public class ClusteringControl extends AbstractViewerControl {
         UiUtils.fillPanel(clusterPanel, new JLabel("#"), spinnerNoCluster, sticky, colorCluster);
         getContentPane().add(clusterPanel, c.nextRow());
 
-
-
-        final JPanel dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(2,1),
-                "Cluster Dendogram");
+        final JPanel dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(2, 1), "Cluster Dendogram");
         final JButton renderButton = new JButton("Render");
         renderButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                Tree<ClusterNode, Integer> clusterTree = new DelegateTree<ClusterNode,
-                        Integer>(new DirectedSparseGraph<ClusterNode, Integer>());
+                Tree<ClusterNode, Integer> clusterTree = new DelegateTree<ClusterNode, Integer>(
+                        new DirectedSparseGraph<ClusterNode, Integer>());
                 ClusterNode node = mapPane.getMap().getCurrentClusteringTree().findNode(1);
 
                 clusterTree.addVertex(node);
                 buildJUNGTree(clusterTree, node, new AtomicInteger(0));
 
-                TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
-                        10, 10);
-                VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer
-                        (clusterLayout, new Dimension(300, 300));
+                TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree, 10,
+                        10);
+                VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer(clusterLayout, new Dimension(
+                        300, 300));
                 GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
 
                 vv2.setVisible(true);
                 dendogramPanel.add(vv2);
+                getContentPane().validate();
             }
         });
 
