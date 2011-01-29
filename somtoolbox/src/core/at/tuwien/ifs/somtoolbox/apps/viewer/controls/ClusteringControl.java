@@ -27,12 +27,12 @@ import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
 import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
 import at.tuwien.ifs.somtoolbox.util.UiUtils;
 import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
-import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Tree;
-import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
 
@@ -183,9 +183,9 @@ public class ClusteringControl extends AbstractViewerControl {
 
 
 
-        final JPanel dendogrammPanel = UiUtils.makeBorderedPanel(new FlowLayout(FlowLayout.LEFT, 10, 0),
-                "Cluster Dendogramm");
-        JButton renderButton = new JButton("Render");
+        final JPanel dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(2,1),
+                "Cluster Dendogram");
+        final JButton renderButton = new JButton("Render");
         renderButton.addActionListener(new ActionListener() {
 
             @Override
@@ -197,17 +197,19 @@ public class ClusteringControl extends AbstractViewerControl {
                 clusterTree.addVertex(node);
                 buildJUNGTree(clusterTree, node, new AtomicInteger(0));
 
-                Layout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree, 10, 10);
-                BasicVisualizationServer<ClusterNode,Integer> visualizationServer = new BasicVisualizationServer
+                TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
+                        10, 10);
+                VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer
                         (clusterLayout, new Dimension(300, 300));
-                visualizationServer.setVisible(true);
+                GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
 
-                dendogrammPanel.add(visualizationServer);
+                vv2.setVisible(true);
+                dendogramPanel.add(vv2);
             }
         });
 
-        dendogrammPanel.add(renderButton);
-        getContentPane().add(dendogrammPanel, c.nextRow());
+        dendogramPanel.add(renderButton);
+        getContentPane().add(dendogramPanel, c.nextRow());
 
         JPanel numLabelPanel = UiUtils.makeBorderedPanel(new GridBagLayout(), "Labels");
         GridBagConstraintsIFS gcLabels = new GridBagConstraintsIFS();
