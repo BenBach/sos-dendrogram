@@ -33,8 +33,10 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Tree;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PObjectOutputStream;
+import org.apache.commons.collections15.Predicate;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -182,7 +184,6 @@ public class ClusteringControl extends AbstractViewerControl {
         getContentPane().add(clusterPanel, c.nextRow());
 
 
-
         final JPanel dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(2,1),
                 "Cluster Dendogram");
         final JButton renderButton = new JButton("Render");
@@ -198,9 +199,19 @@ public class ClusteringControl extends AbstractViewerControl {
                 buildJUNGTree(clusterTree, node, new AtomicInteger(0));
 
                 TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
-                        10, 10);
+                        30, 30);
                 VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer
-                        (clusterLayout, new Dimension(300, 300));
+                        (clusterLayout, new Dimension(300, 200));
+                vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line());
+                vv.getRenderContext().setEdgeArrowPredicate(new Predicate() {
+                    @Override
+                    public boolean evaluate(Object o) {
+                        return false;
+                    }
+                });
+                /*vv.getRenderContext().setVertexLabelTransformer(new EllipseVertexShapeTransformer
+                        (new ConstantTransformer(5.0d), new ConstantTransformer(5.0d)));*/
+
                 GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
 
                 vv2.setVisible(true);
