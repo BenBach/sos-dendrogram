@@ -2,3 +2,4 @@
 *.iml
 .metadata
 build.xml
+out/
