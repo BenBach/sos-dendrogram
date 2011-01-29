@@ -58,43 +58,6 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import edu.uci.ics.jung.algorithms.layout.TreeLayout;
-import edu.uci.ics.jung.graph.DelegateTree;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.Tree;
-import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.util.PObjectOutputStream;
-
-import at.tuwien.ifs.commons.gui.controls.TitledCollapsiblePanel;
-import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
-import at.tuwien.ifs.somtoolbox.apps.viewer.SOMPane;
-import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.ExportUtils;
-import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.LabelXmlUtils;
-import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
-import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
-import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
-import at.tuwien.ifs.somtoolbox.util.UiUtils;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterElementsStorage;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterNode;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringTree;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.KMeans;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.KMeansTreeBuilder;
-
 /**
  * The control panel for the clustering functionality.
  * 
@@ -144,6 +107,8 @@ public class ClusteringControl extends AbstractViewerControl {
     private JLabel entropyLabel;
 
     private JLabel purityLabel;
+
+    private JPanel dendogramPanel;
 
     public ClusteringControl(String title, CommonSOMViewerStateData state, SOMPane mappane) {
         super(title, state, new GridBagLayout());
@@ -224,41 +189,7 @@ public class ClusteringControl extends AbstractViewerControl {
         UiUtils.fillPanel(clusterPanel, new JLabel("#"), spinnerNoCluster, sticky, colorCluster);
         getContentPane().add(clusterPanel, c.nextRow());
 
-        final JPanel dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(2, 1), "Cluster Dendogram");
-        final JButton renderButton = new JButton("Render");
-        renderButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Tree<ClusterNode, Integer> clusterTree = new DelegateTree<ClusterNode, Integer>(
-                        new DirectedSparseGraph<ClusterNode, Integer>());
-                ClusterNode node = mapPane.getMap().getCurrentClusteringTree().findNode(1);
-
-                clusterTree.addVertex(node);
-                buildJUNGTree(clusterTree, node, new AtomicInteger(0));
-
-                TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
-                        30, 30);
-                VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer
-                        (clusterLayout, new Dimension(300, 200));
-                vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line());
-                vv.getRenderContext().setEdgeArrowPredicate(new Predicate() {
-                    @Override
-                    public boolean evaluate(Object o) {
-                        return false;
-                    }
-                });
-                /*vv.getRenderContext().setVertexLabelTransformer(new EllipseVertexShapeTransformer
-                        (new ConstantTransformer(5.0d), new ConstantTransformer(5.0d)));*/
-                GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
-
-                vv2.setVisible(true);
-                dendogramPanel.add(vv2);
-                getContentPane().validate();
-            }
-        });
-
-        dendogramPanel.add(renderButton);
+        dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(0, 1), "Dendogram");
         getContentPane().add(dendogramPanel, c.nextRow());
 
         JPanel numLabelPanel = UiUtils.makeBorderedPanel(new GridBagLayout(), "Labels");
@@ -594,6 +525,38 @@ public class ClusteringControl extends AbstractViewerControl {
     public void updateControlDisplay() {
         kmeansInitialisationPanel.setVisible(mapPane.getMap().getCurrentClusteringTree() != null
                 && mapPane.getMap().getClusteringTreeBuilder() instanceof KMeansTreeBuilder);
+
+        ClusteringTree clusteringTree = mapPane.getMap().getCurrentClusteringTree();
+
+        if(clusteringTree == null) return;
+
+        ClusterNode node = clusteringTree.findNode(1);
+
+        Tree<ClusterNode, Integer> clusterTree = new DelegateTree<ClusterNode,
+                Integer>(new DirectedSparseGraph<ClusterNode, Integer>());
+
+
+        clusterTree.addVertex(node);
+        buildJUNGTree(clusterTree, node, new AtomicInteger(0));
+
+        TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
+                30, 30);
+        VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer(clusterLayout);
+        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line());
+        vv.getRenderContext().setEdgeArrowPredicate(new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return false;
+            }
+        });
+        /*vv.getRenderContext().setVertexLabelTransformer(new EllipseVertexShapeTransformer
+                (new ConstantTransformer(5.0d), new ConstantTransformer(5.0d)));*/
+        GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
+
+        vv2.setVisible(true);
+        dendogramPanel.removeAll();
+        dendogramPanel.add(vv2);
+        getContentPane().validate();
     }
 
 }
