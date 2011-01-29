@@ -17,25 +17,19 @@
  */
 package at.tuwien.ifs.somtoolbox.visualization.clustering;
 
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.apache.commons.lang.ArrayUtils;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-
 import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
 import at.tuwien.ifs.somtoolbox.layers.Label;
 import at.tuwien.ifs.somtoolbox.layers.Unit;
 import at.tuwien.ifs.somtoolbox.util.StringUtils;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Class containing one node in the cluster tree.
@@ -44,6 +38,29 @@ import at.tuwien.ifs.somtoolbox.util.StringUtils;
  * @version $Id: ClusterNode.java 3938 2010-11-17 15:15:25Z mayer $
  */
 public class ClusterNode implements Serializable {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClusterNode that = (ClusterNode) o;
+
+        if (level != that.level) return false;
+        if (child1 != null ? !child1.equals(that.child1) : that.child1 != null) return false;
+        if (child2 != null ? !child2.equals(that.child2) : that.child2 != null) return false;
+        if (!Arrays.equals(unitNodes, that.unitNodes)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = unitNodes != null ? Arrays.hashCode(unitNodes) : 0;
+        result = 31 * result + level;
+        result = 31 * result + (child1 != null ? child1.hashCode() : 0);
+        result = 31 * result + (child2 != null ? child2.hashCode() : 0);
+        return result;
+    }
 
     public static final Color INTIAL_BORDER_COLOUR = Color.BLACK;
 
