@@ -1,0 +1,6 @@
+bin
+dist
+doc
+.settings
+tests
+*.xml

@@ -1,2 +1,4 @@
 .idea/
 *.iml
+.metadata
+build.xml
