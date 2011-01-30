@@ -518,7 +518,7 @@ public class ClusteringControl extends AbstractViewerControl {
         Tree<ClusterNode, Integer> clusterTree = clusteringTree.getJUNGTree();
         TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree, 30, 100);
 
-        Comparator<ClusterNode> mergeCostComparator =new Comparator<ClusterNode>() {
+        Comparator<ClusterNode> mergeCostComparator = new Comparator<ClusterNode>() {
             @Override
             public int compare(ClusterNode o1, ClusterNode o2) {
                 return Double.compare(o1.getMergeCost(), o2.getMergeCost());

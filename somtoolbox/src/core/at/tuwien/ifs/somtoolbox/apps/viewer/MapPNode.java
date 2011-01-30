@@ -687,12 +687,37 @@ public class MapPNode extends PNode {
                 }
             }
 
+            Comparator<ClusterNode> mergeCostComparator = new Comparator<ClusterNode>() {
+                @Override
+                public int compare(ClusterNode o1, ClusterNode o2) {
+                    return Double.compare(o1.getMergeCost(), o2.getMergeCost());
+                }
+            };
+
+            final double maxMergeCost = Collections.max(currentClusteringTree.getJUNGTree().getVertices(),
+                    mergeCostComparator).getMergeCost();
+            final double minMergeCost = Collections.min(currentClusteringTree.getJUNGTree().getVertices(), mergeCostComparator).getMergeCost();
+
             clusterLines = new PNode();
+            PNode clusterColors = new PNode();
 
             double OFFSET = 25.0;
 
+            Palette palette = getState().getSOMViewer().getCurrentlySelectedPalette();
+
             for (int col = 0; col < units.length; col++) {
                 for (int row = 0; row < units[col].length; row++) {
+                    GeneralUnitPNode unit = units[col][row];
+                    ClusterNode n = currentClusteringTree.findClusterOf(unit, maxLevel);
+                    int pos = (int) (((n.getMergeCost() - minMergeCost) / (maxMergeCost - minMergeCost)) * palette
+                                                .getNumberOfColours());
+
+                    PNode coloring = new PNode();
+                    coloring.setBounds(unit.getBounds());
+                    coloring.setPaint(palette.getColor(pos));
+
+                    clusterColors.addChild(coloring);
+
                     if (row < units[col].length - 1) {
                         GeneralUnitPNode unit1 = units[col][row];
                         GeneralUnitPNode unit2 = units[col][row + 1];
@@ -741,6 +766,8 @@ public class MapPNode extends PNode {
 
             clusterLines.moveToFront();
 
+            addChild(clusterColors);
+            clusterColors.moveToBack();
             addChild(clusterLines);
 
             // currentClusteringTree.setState(state);
