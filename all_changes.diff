@@ -1,0 +1,918 @@
+diff --git a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/MapPNode.java b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/MapPNode.java
+index 9b3c25d..a6deba0 100644
+--- a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/MapPNode.java
++++ b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/MapPNode.java
+@@ -17,6 +17,31 @@
+  */
+ package at.tuwien.ifs.somtoolbox.apps.viewer;
+ 
++import java.awt.BasicStroke;
++import java.awt.Color;
++import java.awt.Font;
++import java.awt.Image;
++import java.awt.Point;
++import java.awt.geom.GeneralPath;
++import java.awt.geom.Line2D;
++import java.awt.geom.Point2D;
++import java.awt.image.BufferedImage;
++import java.io.FileNotFoundException;
++import java.util.ArrayList;
++import java.util.HashSet;
++import java.util.Iterator;
++import java.util.Map;
++import java.util.SortedMap;
++import java.util.TreeMap;
++import java.util.logging.Logger;
++
++import javax.swing.JFrame;
++import javax.swing.JOptionPane;
++
++import edu.umd.cs.piccolo.PNode;
++import edu.umd.cs.piccolo.nodes.PImage;
++import edu.umd.cs.piccolo.nodes.PPath;
++
+ import at.tuwien.ifs.somtoolbox.SOMToolboxException;
+ import at.tuwien.ifs.somtoolbox.apps.PaletteEditor;
+ import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
+@@ -36,21 +61,17 @@ import at.tuwien.ifs.somtoolbox.models.GrowingSOM;
+ import at.tuwien.ifs.somtoolbox.util.LabelPNodeGenerator;
+ import at.tuwien.ifs.somtoolbox.util.ProgressListener;
+ import at.tuwien.ifs.somtoolbox.util.StdErrProgressWriter;
+-import at.tuwien.ifs.somtoolbox.visualization.*;
+-import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
+-import edu.umd.cs.piccolo.PNode;
+-import edu.umd.cs.piccolo.nodes.PImage;
+-import edu.umd.cs.piccolo.nodes.PPath;
+-
+-import javax.swing.*;
+-import java.awt.*;
+-import java.awt.geom.GeneralPath;
+-import java.awt.geom.Line2D;
+-import java.awt.geom.Point2D;
+-import java.awt.image.BufferedImage;
+-import java.io.FileNotFoundException;
+-import java.util.*;
+-import java.util.logging.Logger;
++import at.tuwien.ifs.somtoolbox.visualization.AbstractMatrixVisualizer;
++import at.tuwien.ifs.somtoolbox.visualization.BackgroundImageVisualizer;
++import at.tuwien.ifs.somtoolbox.visualization.Palette;
++import at.tuwien.ifs.somtoolbox.visualization.SearchResultHistogramVisualizer;
++import at.tuwien.ifs.somtoolbox.visualization.ThematicClassMapVisualizer;
++import at.tuwien.ifs.somtoolbox.visualization.Visualizations;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterElementsStorage;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringAbortedException;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringTree;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.NonHierarchicalTreeBuilder;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.TreeBuilder;
+ 
+ /**
+  * The graphical representation of a map in the {@link SOMViewer} application. This class makes use of the <a
+@@ -133,8 +154,6 @@ public class MapPNode extends PNode {
+ 
+     private TreeBuilder clusteringTreeBuilder;
+ 
+-    private PNode clusterLines;
+-
+     /**
+      * Default constructors - reading of input files not yet done.
+      */
+@@ -624,134 +643,15 @@ public class MapPNode extends PNode {
+         }
+     }
+ 
+-    private float scaleLineWidth(float depth, float max, float min) {
+-        float MAX_LINE_WIDTH = 40.0f;
+-        float MIN_LINE_WIDTH = 1.0f;
+-
+-        float lineWidth = depth - min;
+-        lineWidth /= max - min;
+-        lineWidth *= MAX_LINE_WIDTH - MIN_LINE_WIDTH;
+-        lineWidth += MIN_LINE_WIDTH;
+-
+-        return Math.abs(lineWidth);
+-    }
+-
+     // Angela
+     /**
+      * Creates new {@link TreeBuilder}. if the builder is null, the current clustering is removed.
+      */
+     public void buildTree(TreeBuilder builder) throws ClusteringAbortedException {
+-        if (clusterLines != null) {
+-            this.removeChild(clusterLines);
+-            clusterLines = null;
+-        }
+-
+         if (builder == null) {
+             currentClusteringTree = null;
+         } else {
+             currentClusteringTree = builder.createTree(units);
+-            HashMap<PNode, Integer> distanceInfo = currentClusteringTree.getDendrogramDistanceInfo();
+-
+-            int maxLevel = Collections.max(distanceInfo.values());
+-
+-            ArrayList<ClusterNode> nodes = currentClusteringTree.getNodesAtLevel(maxLevel);
+-
+-            float maxMerge = Float.MIN_VALUE;
+-            float minMerge = Float.MAX_VALUE;
+-
+-            for (int i = 0; i < nodes.size(); i++) {
+-                float merge1 = (float) nodes.get(i).getMergeCost();
+-
+-                for (int j = i + 1; j < nodes.size(); j++) {
+-                    float merge2 = (float) nodes.get(j).getMergeCost();
+-                    float mergeDiff = Math.abs(merge1 - merge2);
+-
+-                    if (mergeDiff > maxMerge) {
+-                        maxMerge = mergeDiff;
+-                    }
+-                    if (mergeDiff < minMerge) {
+-                        minMerge = mergeDiff;
+-                    }
+-                }
+-            }
+-
+-            int maxDepth = Integer.MIN_VALUE;
+-            int minDepth = Integer.MAX_VALUE;
+-
+-            Integer[] depths = new Integer[0];
+-            depths = distanceInfo.values().toArray(depths);
+-
+-            for (int i = 0; i < depths.length; i++) {
+-                int depth1 = depths[i];
+-
+-                for (int j = i + 1; j < depths.length; j++) {
+-                    int depth2 = depths[j];
+-                    int depthDiff = Math.abs(depth1 - depth2);
+-
+-                    if (depthDiff > maxDepth) {
+-                        maxDepth = depthDiff;
+-                    }
+-                    if (depthDiff < minDepth) {
+-                        minDepth = depthDiff;
+-                    }
+-                }
+-            }
+-
+-            clusterLines = new PNode();
+-            double OFFSET = 25.0;
+-
+-            for (int col = 0; col < units.length; col++) {
+-                for (int row = 0; row < units[col].length; row++) {
+-                    if (row < units[col].length - 1) {
+-                        GeneralUnitPNode unit1 = units[col][row];
+-                        GeneralUnitPNode unit2 = units[col][row + 1];
+-
+-                        float x1 = (float) (unit1.getX() + unit1.getWidth() / 2);
+-                        float y1 = (float) (unit1.getY() + unit1.getHeight() - OFFSET);
+-                        float x2 = (float) (unit2.getX() + unit2.getWidth() / 2);
+-                        float y2 = (float) (unit2.getY() + OFFSET);
+-
+-                        PPath line = PPath.createLine(x1, y1, x2, y2);
+-
+-                        ClusterNode n1 = currentClusteringTree.findClusterOf(unit1, maxLevel);
+-                        ClusterNode n2 = currentClusteringTree.findClusterOf(unit2, maxLevel);
+-
+-                        // int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+-                        float lineWidth = scaleLineWidth((float) Math.abs(n1.getMergeCost() - n2.getMergeCost()),
+-                                maxMerge, minMerge);
+-
+-                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
+-                        clusterLines.addChild(line);
+-                    }
+-
+-                    if (col < units.length - 1) {
+-                        GeneralUnitPNode unit1 = units[col][row];
+-                        GeneralUnitPNode unit2 = units[col + 1][row];
+-
+-                        float x1 = (float) (unit1.getX() + unit1.getWidth() + OFFSET);
+-                        float y1 = (float) (unit1.getY() + unit1.getHeight() / 2);
+-                        float x2 = (float) (unit2.getX() - OFFSET);
+-                        float y2 = (float) (unit2.getY() + unit2.getHeight() / 2);
+-
+-                        PPath line = PPath.createLine(x1, y1, x2, y2);
+-
+-                        ClusterNode n1 = currentClusteringTree.findClusterOf(unit1, maxLevel);
+-                        ClusterNode n2 = currentClusteringTree.findClusterOf(unit2, maxLevel);
+-
+-                        // int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+-                        float lineWidth = scaleLineWidth((float) Math.abs(n1.getMergeCost() - n2.getMergeCost()),
+-                                maxMerge, minMerge);
+-
+-                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
+-                        clusterLines.addChild(line);
+-                    }
+-                }
+-            }
+-
+-            clusterLines.moveToFront();
+-
+-            addChild(clusterLines);
+-
+             // currentClusteringTree.setState(state);
+             currentClusteringTree.recolorTree();
+         }
+@@ -798,19 +698,14 @@ public class MapPNode extends PNode {
+ 
+         currentClusteringElements = elements;
+ 
+-        LinkedList<PNode> selectedBorder = new LinkedList<PNode>();
+-
+         // show new elements
+         if (elements != null) {
+             for (ClusterElementsStorage n : currentClusteringElements.values()) {
+                 if (n.clusterBorders != null) {
+                     // System.out.println("Added border node " + n.border.hashCode() + " (" + n.hashCode() + ")");
+                     for (PNode borderLine : n.clusterBorders) {
+-                        if( ((PPath) borderLine.getChild(0)).getStrokePaint().equals(Color.RED))
+-                            selectedBorder.add(borderLine);
+-
+                         addChild(borderLine);
+-                        borderLine.moveToFront();
++                        borderLine.moveToBack();
+                         if (currentVisualizationImage != null) {
+                             borderLine.moveInFrontOf(currentVisualizationImage);
+                         }
+@@ -832,9 +727,6 @@ public class MapPNode extends PNode {
+                 }
+             }
+         }
+-
+-        for(PNode sb : selectedBorder)
+-            sb.moveToFront();
+         // System.out.println("Applied new clustering " + elements.hashCode());
+     }
+ 
+diff --git a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/controls/ClusteringControl.java b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/controls/ClusteringControl.java
+index 8e6a07e..058eae3 100644
+--- a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/controls/ClusteringControl.java
++++ b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/apps/viewer/controls/ClusteringControl.java
+@@ -17,41 +17,13 @@
+  */
+ package at.tuwien.ifs.somtoolbox.apps.viewer.controls;
+ 
+-import at.tuwien.ifs.commons.gui.controls.TitledCollapsiblePanel;
+-import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
+-import at.tuwien.ifs.somtoolbox.apps.viewer.SOMPane;
+-import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.ExportUtils;
+-import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.LabelXmlUtils;
+-import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
+-import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
+-import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
+-import at.tuwien.ifs.somtoolbox.util.UiUtils;
+-import at.tuwien.ifs.somtoolbox.visualization.Palette;
+-import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
+-import edu.uci.ics.jung.algorithms.layout.TreeLayout;
+-import edu.uci.ics.jung.graph.Graph;
+-import edu.uci.ics.jung.graph.Tree;
+-import edu.uci.ics.jung.graph.util.Context;
+-import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
+-import edu.uci.ics.jung.visualization.VisualizationViewer;
+-import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+-import edu.uci.ics.jung.visualization.control.GraphMouseListener;
+-import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
+-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+-import edu.umd.cs.piccolo.PNode;
+-import edu.umd.cs.piccolo.util.PObjectOutputStream;
+-import org.apache.commons.collections15.PredicateUtils;
+-import org.apache.commons.collections15.Transformer;
+-
+-import javax.swing.*;
+-import javax.swing.event.ChangeEvent;
+-import javax.swing.event.ChangeListener;
+-import javax.swing.filechooser.FileNameExtensionFilter;
+-import java.awt.*;
++import java.awt.Color;
++import java.awt.FlowLayout;
++import java.awt.GridBagConstraints;
++import java.awt.GridBagLayout;
++import java.awt.GridLayout;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
+-import java.awt.event.MouseEvent;
+-import java.awt.geom.Point2D;
+ import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.FileOutputStream;
+@@ -64,6 +36,37 @@ import java.util.logging.Logger;
+ import java.util.zip.GZIPInputStream;
+ import java.util.zip.GZIPOutputStream;
+ 
++import javax.swing.JButton;
++import javax.swing.JCheckBox;
++import javax.swing.JComboBox;
++import javax.swing.JFileChooser;
++import javax.swing.JLabel;
++import javax.swing.JPanel;
++import javax.swing.JSlider;
++import javax.swing.JSpinner;
++import javax.swing.SpinnerNumberModel;
++import javax.swing.event.ChangeEvent;
++import javax.swing.event.ChangeListener;
++import javax.swing.filechooser.FileNameExtensionFilter;
++
++import edu.umd.cs.piccolo.PNode;
++import edu.umd.cs.piccolo.util.PObjectOutputStream;
++
++import at.tuwien.ifs.commons.gui.controls.TitledCollapsiblePanel;
++import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
++import at.tuwien.ifs.somtoolbox.apps.viewer.SOMPane;
++import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.ExportUtils;
++import at.tuwien.ifs.somtoolbox.apps.viewer.fileutils.LabelXmlUtils;
++import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
++import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
++import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
++import at.tuwien.ifs.somtoolbox.util.UiUtils;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterElementsStorage;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterNode;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringTree;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.KMeans;
++import at.tuwien.ifs.somtoolbox.visualization.clustering.KMeansTreeBuilder;
++
+ /**
+  * The control panel for the clustering functionality.
+  * 
+@@ -114,8 +117,6 @@ public class ClusteringControl extends AbstractViewerControl {
+ 
+     private JLabel purityLabel;
+ 
+-    private JPanel dendogramPanel;
+-
+     public ClusteringControl(String title, CommonSOMViewerStateData state, SOMPane mappane) {
+         super(title, state, new GridBagLayout());
+         this.mapPane = mappane;
+@@ -123,8 +124,6 @@ public class ClusteringControl extends AbstractViewerControl {
+         updateControlDisplay();
+     }
+ 
+-
+-
+     public void init() {
+ 
+         maxCluster = state.growingLayer.getXSize() * state.growingLayer.getYSize();
+@@ -177,8 +176,8 @@ public class ClusteringControl extends AbstractViewerControl {
+         UiUtils.fillPanel(clusterPanel, new JLabel("#"), spinnerNoCluster, sticky, colorCluster);
+         getContentPane().add(clusterPanel, c.nextRow());
+ 
+-        dendogramPanel = UiUtils.makeBorderedPanel(new GridLayout(0, 1), "Dendogram");
+-        getContentPane().add(dendogramPanel, c.nextRow());
++        JPanel dendogrammPanel = UiUtils.makeBorderedPanel(new FlowLayout(FlowLayout.LEFT, 10, 0), "Cluster Dendogramm");
++        getContentPane().add(dendogrammPanel, c.nextRow());
+ 
+         JPanel numLabelPanel = UiUtils.makeBorderedPanel(new GridBagLayout(), "Labels");
+         GridBagConstraintsIFS gcLabels = new GridBagConstraintsIFS();
+@@ -513,142 +512,6 @@ public class ClusteringControl extends AbstractViewerControl {
+     public void updateControlDisplay() {
+         kmeansInitialisationPanel.setVisible(mapPane.getMap().getCurrentClusteringTree() != null
+                 && mapPane.getMap().getClusteringTreeBuilder() instanceof KMeansTreeBuilder);
+-
+-        ClusteringTree clusteringTree = mapPane.getMap().getCurrentClusteringTree();
+-
+-        if(clusteringTree == null) return;
+-
+-        Tree<ClusterNode, Integer> tree = clusteringTree.getJUNGTree();
+-
+-        TreeLayout<ClusterNode, Integer> layout = new TreeLayout<ClusterNode, Integer>(tree, 30, 100);
+-
+-        final double maxMergeCost = clusteringTree.getMaxMergeCost();
+-        final double minMergeCost = clusteringTree.getMinMergeCost();
+-
+-        final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(layout);
+-
+-        // setup edge rendering
+-
+-        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
+-        vv.getRenderContext().setEdgeStrokeTransformer(new Transformer<Integer, Stroke>() {
+-            @Override
+-            public Stroke transform(Integer integer) {
+-                return new BasicStroke(1.0f);
+-            }
+-        });
+-        vv.getRenderContext().setEdgeArrowPredicate(
+-                PredicateUtils.<Context<Graph<ClusterNode, Integer>, Integer>>falsePredicate());
+-                vv.getRenderContext().setEdgeDrawPaintTransformer(new Transformer<Integer, Paint>() {
+-            @Override
+-            public Paint transform(Integer edge) {
+-                return Color.BLACK;
+-            }
+-        });
+-
+-        // setup vertex rendering
+-
+-        vv.getRenderContext().setVertexLabelTransformer(new Transformer<ClusterNode, String>() {
+-            @Override
+-            public String transform(ClusterNode clusterNode) {
+-                Point2D.Double centroid = clusterNode.getCentroid();
+-                return String.format("%d @ (%f, %f)", clusterNode.getNodes().length, centroid.getX(), centroid.getY());
+-            }
+-        });
+-        vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<ClusterNode, Paint>() {
+-            @Override
+-            public Paint transform(ClusterNode clusterNode) {
+-                Palette palette = mapPane.getState().getSOMViewer().getCurrentlySelectedPalette();
+-
+-                double pos = clusterNode.getMergeCost() - minMergeCost;
+-                pos /= maxMergeCost - minMergeCost;
+-                pos *= palette.getNumberOfColours() - 1;
+-
+-                return palette.getColor((int) pos);
+-            }
+-        });
+-        vv.getRenderContext().setVertexStrokeTransformer(new Transformer<ClusterNode, Stroke>() {
+-            @Override
+-            public Stroke transform(ClusterNode clusterNode) {
+-                if (vv.getPickedVertexState().isPicked(clusterNode))
+-                    return new BasicStroke(3.0f);
+-                else return new BasicStroke(1.0f);
+-            }
+-        });
+-        vv.setVertexToolTipTransformer(new Transformer<ClusterNode, String>() {
+-            @Override
+-            public String transform(ClusterNode clusterNode) {
+-                StringBuilder result = new StringBuilder();
+-
+-                result.append("Level: ").append(clusterNode.getLevel()).append("\r\n");
+-                result.append("Merge-cost: ").append(String.format("%.2f", clusterNode.getMergeCost())).append("\r\n");
+-                result.append("Centroid: ").append(String.format("%.2f", clusterNode.getCentroid().getX())).
+-                        append(", ").append(String.format("%.2f", clusterNode.getCentroid().getY())).append("\r\n");
+-                result.append("Factor-value: ").append(String.format("%.2f", clusterNode.getFactorValue())).append
+-                        ("\r\n");
+-                result.append("#Nodes: ").append(clusterNode.getUnitNodes().length).append("\r\n");
+-                result.append("Mean-vector: ");
+-
+-                for(double d:clusterNode.getMeanVector())
+-                    result.append(String.format("%.2f", d)).append(", ");
+-
+-                result.append("\r\n");
+-
+-                result.append("Bounds: (x=").append(String.format("%.2f", clusterNode.getX()))
+-                        .append(", y=").append(String.format("%.2f", clusterNode.getY()))
+-                        .append(", w=").append(String.format("%.2f", clusterNode.getWidth()))
+-                        .append(", h=").append(String.format("%.2f", clusterNode.getHeight()))
+-                        .append(")\r\n");
+-
+-                return result.toString();
+-            }
+-        });
+-
+-        GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
+-
+-        vv2.setPreferredSize(new Dimension(dendogramPanel.getParent().getWidth(), 200));
+-        vv2.setVisible(true);
+-
+-        DefaultModalGraphMouse<ClusterNode, Integer> graphMouse = new DefaultModalGraphMouse<ClusterNode, Integer>();
+-        vv.setGraphMouse(graphMouse);
+-        graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
+-
+-
+-
+-        vv.addGraphMouseListener(new GraphMouseListener<ClusterNode>() {
+-            private ClusterNode previouslySelected;
+-
+-            @Override
+-            public void graphClicked(ClusterNode clusterNode, MouseEvent me) {
+-                if(previouslySelected != null)
+-                    previouslySelected.setSelected(false);
+-
+-                clusterNode.setSelected(true);
+-                previouslySelected = clusterNode;
+-
+-                numClusters = clusterNode.getLevel();
+-                SortedMap<Integer, ClusterElementsStorage> m = mapPane.getMap().getCurrentClusteringTree().getAllClusteringElements();
+-                if (m.containsKey(numClusters)) {
+-                    st = m.get(numClusters).sticky;
+-                } else {
+-                    st = false;
+-                }
+-                sticky.setSelected(st);
+-                redrawClustering();
+-            }
+-
+-            @Override
+-            public void graphPressed(ClusterNode clusterNode, MouseEvent me) {
+-            }
+-
+-            @Override
+-            public void graphReleased(ClusterNode clusterNode, MouseEvent me) {
+-            }
+-        });
+-
+-        dendogramPanel.removeAll();
+-        dendogramPanel.add(vv2);
+-
+-        getContentPane().validate();
+     }
+ 
+ }
+diff --git a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusterNode.java b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusterNode.java
+index cb8d364..b4ff4c2 100644
+--- a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusterNode.java
++++ b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusterNode.java
+@@ -17,19 +17,25 @@
+  */
+ package at.tuwien.ifs.somtoolbox.visualization.clustering;
+ 
++import java.awt.Color;
++import java.awt.Paint;
++import java.awt.geom.Point2D;
++import java.awt.geom.Rectangle2D;
++import java.io.Serializable;
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.TreeMap;
++import java.util.TreeSet;
++
++import org.apache.commons.lang.ArrayUtils;
++
++import edu.umd.cs.piccolo.PNode;
++import edu.umd.cs.piccolo.nodes.PPath;
++
+ import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
+ import at.tuwien.ifs.somtoolbox.layers.Label;
+ import at.tuwien.ifs.somtoolbox.layers.Unit;
+ import at.tuwien.ifs.somtoolbox.util.StringUtils;
+-import edu.umd.cs.piccolo.PNode;
+-import edu.umd.cs.piccolo.nodes.PPath;
+-import org.apache.commons.lang.ArrayUtils;
+-
+-import java.awt.*;
+-import java.awt.geom.Point2D;
+-import java.awt.geom.Rectangle2D;
+-import java.io.Serializable;
+-import java.util.*;
+ 
+ /**
+  * Class containing one node in the cluster tree.
+@@ -39,11 +45,9 @@ import java.util.*;
+  */
+ public class ClusterNode implements Serializable {
+ 
+-
+     public static final Color INTIAL_BORDER_COLOUR = Color.BLACK;
+ 
+     private Color borderColor = INTIAL_BORDER_COLOUR;
+-    private Color selectedBorderColor = Color.RED;
+ 
+     // increment serialVersionUID if class changes so it is incompatible with previous versions (-> [de]serialization )
+     private static final long serialVersionUID = 2L;
+@@ -88,8 +92,6 @@ public class ClusterNode implements Serializable {
+ 
+     private double height;
+ 
+-    private boolean isSelected;
+-
+     /**
+      * Returns the mean vector of the cluster's weight vectors. Calculates it if it is not set yet.
+      * 
+@@ -97,18 +99,18 @@ public class ClusterNode implements Serializable {
+      */
+     public double[] getMeanVector() {
+ 
+-        int weightVectorLength = getUnitNodes()[0].getUnit().getWeightVector().length;
++        int weightVectorLength = unitNodes[0].getUnit().getWeightVector().length;
+         if (mean == null) {
+             mean = new double[weightVectorLength];
+ 
+             for (int j = 0; j < weightVectorLength; j++) {
+                 double sum = 0;
+-                for (GeneralUnitPNode unitNode : getUnitNodes()) {
++                for (GeneralUnitPNode unitNode : unitNodes) {
+ 
+                     sum = sum + unitNode.getUnit().getWeightVector()[j];
+                 }
+ 
+-                mean[j] = sum / getUnitNodes().length;
++                mean[j] = sum / unitNodes.length;
+             }
+         }
+         return mean;
+@@ -123,12 +125,12 @@ public class ClusterNode implements Serializable {
+             double x = 0;
+             double y = 0;
+             int i;
+-            for (i = 0; i < getUnitNodes().length; i++) {
+-                x = x + getUnitNodes()[i].getX();
+-                y = y + getUnitNodes()[i].getY();
++            for (i = 0; i < unitNodes.length; i++) {
++                x = x + unitNodes[i].getX();
++                y = y + unitNodes[i].getY();
+             }
+-            x = x / i + getUnitNodes()[0].getWidth() / 2;
+-            y = y / i + getUnitNodes()[0].getHeight() / 2;
++            x = x / i + unitNodes[0].getWidth() / 2;
++            y = y / i + unitNodes[0].getHeight() / 2;
+             centroid = new Point2D.Double(x, y);
+             centroidX = x;
+             centroidY = y;
+@@ -153,13 +155,13 @@ public class ClusterNode implements Serializable {
+      */
+     public ClusterNode(ClusterNode n1, ClusterNode n2, int level) {
+         this.level = level;
+-        this.setUnitNodes(new GeneralUnitPNode[n1.getNodes().length + n2.getNodes().length]);
++        this.unitNodes = new GeneralUnitPNode[n1.getNodes().length + n2.getNodes().length];
+ 
+         for (int i = 0; i < n1.getNodes().length; i++) {
+-            this.getUnitNodes()[i] = n1.getNodes()[i];
++            this.unitNodes[i] = n1.getNodes()[i];
+         }
+         for (int i = 0; i < n2.getNodes().length; i++) {
+-            this.getUnitNodes()[i + n1.getNodes().length] = n2.getNodes()[i];
++            this.unitNodes[i + n1.getNodes().length] = n2.getNodes()[i];
+         }
+         this.child1 = n1;
+         this.child2 = n2;
+@@ -213,8 +215,8 @@ public class ClusterNode implements Serializable {
+      * @param level a number >= the number of total units.
+      */
+     public ClusterNode(GeneralUnitPNode leaf, int level) {
+-        setUnitNodes(new GeneralUnitPNode[1]);
+-        getUnitNodes()[0] = leaf;
++        unitNodes = new GeneralUnitPNode[1];
++        unitNodes[0] = leaf;
+         border = makeBorder();
+ 
+         this.level = level;
+@@ -248,7 +250,7 @@ public class ClusterNode implements Serializable {
+         int count = 0; // number of units containing inputs
+ 
+         Label[] tmpLabels;// = new Label[5];
+-        for (GeneralUnitPNode unitNode : getUnitNodes()) {
++        for (GeneralUnitPNode unitNode : unitNodes) {
+             int num = unitNode.getUnit().getNumberOfMappedInputs();
+             if (num > 0) {
+                 count++;
+@@ -382,29 +384,25 @@ public class ClusterNode implements Serializable {
+      * Returns all the {@link GeneralUnitPNode}s contained in this cluster
+      */
+     public GeneralUnitPNode[] getNodes() {
+-        return this.getUnitNodes();
++        return this.unitNodes;
+     }
+ 
+     public boolean containsNode(GeneralUnitPNode node) {
+-        return ArrayUtils.contains(this.getUnitNodes(), node);
++        return ArrayUtils.contains(this.unitNodes, node);
+     }
+ 
+     public boolean containsAllNodes(Collection<GeneralUnitPNode> nodes) {
+-        if (nodes.size() != getUnitNodes().length) {
++        if (nodes.size() != unitNodes.length) {
+             return false;
+         }
+         for (GeneralUnitPNode node : nodes) {
+-            if (!ArrayUtils.contains(this.getUnitNodes(), node)) {
++            if (!ArrayUtils.contains(this.unitNodes, node)) {
+                 return false;
+             }
+         }
+         return true;
+     }
+ 
+-    public void setSelected(boolean selected) {
+-        isSelected = selected;
+-    }
+-
+     /**
+      * Returns a border for this cluster
+      * 
+@@ -412,7 +410,7 @@ public class ClusterNode implements Serializable {
+      */
+     private BorderPNode makeBorder() {
+         ArrayList<Rectangle2D> lines = new ArrayList<Rectangle2D>();
+-        for (GeneralUnitPNode u : getUnitNodes()) {
++        for (GeneralUnitPNode u : unitNodes) {
+             double left = u.getX();
+             double right = u.getX() + u.getWidth();
+             double top = u.getY();
+@@ -427,7 +425,7 @@ public class ClusterNode implements Serializable {
+         for (Rectangle2D rect : lines) {
+             PPath line = PPath.createLine((float) rect.getMinX(), (float) rect.getMinY(), (float) rect.getMaxX(),
+                     (float) rect.getMaxY());
+-            line.setStrokePaint(isSelected ? selectedBorderColor : borderColor);
++            line.setStrokePaint(borderColor);
+             border.addChild(line);
+         }
+         return border;
+@@ -539,18 +537,4 @@ public class ClusterNode implements Serializable {
+         return mergeCost;
+     }
+ 
+-    /**
+-     * @param unitNodes The unitNodes to set.
+-     */
+-    public void setUnitNodes(GeneralUnitPNode[] unitNodes) {
+-        this.unitNodes = unitNodes;
+-    }
+-
+-    /**
+-     * @return Returns the unitNodes.
+-     */
+-    public GeneralUnitPNode[] getUnitNodes() {
+-        return unitNodes;
+-    }
+-
+ }
+diff --git a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusteringTree.java b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusteringTree.java
+index bde155e..b84f79f 100644
+--- a/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusteringTree.java
++++ b/somtoolbox/src/core/at/tuwien/ifs/somtoolbox/visualization/clustering/ClusteringTree.java
+@@ -17,19 +17,23 @@
+  */
+ package at.tuwien.ifs.somtoolbox.visualization.clustering;
+ 
+-import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
+-import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
+-import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
+-import edu.uci.ics.jung.graph.DelegateTree;
+-import edu.uci.ics.jung.graph.DirectedSparseGraph;
+-import edu.uci.ics.jung.graph.Tree;
++import java.awt.BasicStroke;
++import java.awt.Color;
++import java.awt.Font;
++import java.awt.geom.Point2D;
++import java.io.Serializable;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.SortedMap;
++import java.util.TreeMap;
++import java.util.TreeSet;
++
+ import edu.umd.cs.piccolo.PNode;
+ import edu.umd.cs.piccolo.nodes.PText;
+ 
+-import java.awt.*;
+-import java.io.Serializable;
+-import java.util.*;
+-import java.util.concurrent.atomic.AtomicInteger;
++import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
++import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
++import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
+ 
+ /**
+  * Class for storing the clustering.
+@@ -55,13 +59,6 @@ public class ClusteringTree extends PNode implements Serializable {
+ 
+     public static final Font defaultFont = new Font("Sans", Font.PLAIN, 40);
+ 
+-    private Tree<ClusterNode, Integer> jungTree;
+-
+-    private HashMap<PNode, Integer> distancesToTopNode;
+-
+-    private double minMergeCost = Double.NaN;
+-    private double maxMergeCost = Double.NaN;
+-
+     /**
+      * Initializes the tree with the given top Node.
+      * 
+@@ -74,39 +71,6 @@ public class ClusteringTree extends PNode implements Serializable {
+         startFontSize = 6 * width; // 10-> 6
+     }
+ 
+-    public Tree<ClusterNode, Integer> getJUNGTree() {
+-        if (jungTree != null) {
+-            return jungTree;
+-        }
+-
+-        jungTree = new DelegateTree<ClusterNode, Integer>(new DirectedSparseGraph<ClusterNode, Integer>());
+-        jungTree.addVertex(topNode);
+-
+-        buildJUNGTree(jungTree, topNode, new AtomicInteger(0));
+-
+-        return jungTree;
+-    }
+-
+-    private void buildJUNGTree(Tree<ClusterNode, Integer> tree, ClusterNode curNode, AtomicInteger curEdge) {
+-        if (curNode == null) {
+-            return;
+-        }
+-
+-        ClusterNode c1 = curNode.getChild1();
+-        ClusterNode c2 = curNode.getChild2();
+-
+-        if (c1 != null) {
+-            tree.addEdge(curEdge.incrementAndGet(), curNode, c1);
+-        }
+-
+-        if (c2 != null) {
+-            tree.addEdge(curEdge.incrementAndGet(), curNode, c2);
+-        }
+-
+-        buildJUNGTree(tree, c1, curEdge);
+-        buildJUNGTree(tree, c2, curEdge);
+-    }
+-
+     public ClusterNode findNode(int lvl) {
+         return findNode(topNode, lvl);
+     }
+@@ -263,78 +227,6 @@ public class ClusteringTree extends PNode implements Serializable {
+         return allClusteringElements;
+     }
+ 
+-    private double getMaxMergeCost(ClusterNode node, double curMax) {
+-        if (node == null) return curMax;
+-
+-        if(node.getMergeCost() > curMax) {
+-            curMax = node.getMergeCost();
+-        }
+-
+-        curMax = getMaxMergeCost(node.getChild1(), curMax);
+-        curMax = getMaxMergeCost(node.getChild2(), curMax);
+-
+-        return curMax;
+-    }
+-
+-    public double getMaxMergeCost() {
+-        if(Double.isNaN(maxMergeCost))
+-            maxMergeCost = getMaxMergeCost(topNode, topNode.getMergeCost());
+-
+-        return maxMergeCost;
+-    }
+-
+-    private double getMinMergeCost(ClusterNode node, double curMin) {
+-        if (node == null) return curMin;
+-
+-        if(node.getMergeCost() < curMin) {
+-            curMin = node.getMergeCost();
+-        }
+-
+-        curMin = getMinMergeCost(node.getChild1(), curMin);
+-        curMin = getMinMergeCost(node.getChild2(), curMin);
+-
+-        return curMin;
+-    }
+-
+-    public double getMinMergeCost() {
+-        if(Double.isNaN(minMergeCost))
+-            minMergeCost = getMinMergeCost(topNode, topNode.getMergeCost());
+-
+-        return minMergeCost;
+-    }
+-
+-    public HashMap<PNode, Integer> getDendrogramDistanceInfo() {
+-        // Foreach of the notes calculate distance to top note
+-        distancesToTopNode = new HashMap<PNode, Integer>();
+-
+-        recursiveCalculateDistances(topNode, 0);
+-
+-        return distancesToTopNode;
+-    }
+-
+-    private void recursiveCalculateDistances(ClusterNode parent, Integer distance) {
+-        ClusterNode child1 = parent.getChild1();
+-        ClusterNode child2 = parent.getChild2();
+-
+-        if (child1 != null) {
+-            recursiveCalculateDistances(child1, distance + 1);
+-        }
+-        if (child2 != null) {
+-            recursiveCalculateDistances(child2, distance + 1);
+-        }
+-
+-        // If it's a leaf
+-        if (child1 == null && child2 == null) {
+-            for (PNode node : parent.getUnitNodes()) {
+-                distancesToTopNode.put(node, distance);
+-            }
+-        }
+-    }
+-
+-    public int compareClusterDistanceOfPNodes(PNode node1, PNode node2) {
+-        return Math.abs(distancesToTopNode.get(node1) - distancesToTopNode.get(node2));
+-    }
+-
+     /**
+      * give some advanced debug output
+      */
+@@ -458,19 +350,8 @@ public class ClusteringTree extends PNode implements Serializable {
+      * @param col Color[] contaning the Palette
+      */
+     private void recolorTree(Color[] col, ClusterNode n) {
+-        if(n == null) return;
+-
+         CommonSOMViewerStateData state = CommonSOMViewerStateData.getInstance();
+ 
+-        int pos =
+-                (int) (((n.getMergeCost() - getMinMergeCost()) / ( getMaxMergeCost() - getMinMergeCost())) * (col.length-1));
+-        Color curCol = state.colorClusters ? col[pos] : Color.WHITE;
+-
+-        n.setPaint(curCol);
+-
+-        recolorTree(col, n.getChild1());
+-        recolorTree(col, n.getChild2());
+-/*
+         if (n == null) {
+             return;
+         }
+@@ -504,7 +385,6 @@ public class ClusteringTree extends PNode implements Serializable {
+             recolorTree(col, n.getChild1());
+             recolorTree(col, n.getChild2());
+         }
+-        */
+     }
+ 
+     /**
+@@ -547,5 +427,4 @@ public class ClusteringTree extends PNode implements Serializable {
+         getAllChildrenUntil(level - 1, topNode, list);
+         return list;
+     }
+-
+ }
