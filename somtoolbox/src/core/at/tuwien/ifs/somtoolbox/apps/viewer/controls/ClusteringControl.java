@@ -28,8 +28,6 @@ import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
 import at.tuwien.ifs.somtoolbox.util.UiUtils;
 import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
-import edu.uci.ics.jung.graph.DelegateTree;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Tree;
 import edu.uci.ics.jung.graph.util.Context;
@@ -49,7 +47,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,7 +59,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.ListIterator;
 import java.util.SortedMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -523,6 +522,12 @@ public class ClusteringControl extends AbstractViewerControl {
 
         final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(clusterLayout);
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
+        vv.getRenderContext().setEdgeStrokeTransformer(new Transformer<Integer, Stroke>() {
+            @Override
+            public Stroke transform(Integer integer) {
+                return new BasicStroke(1.0f);
+            }
+        });
         vv.getRenderContext().setEdgeArrowPredicate(
                 PredicateUtils.<Context<Graph<ClusterNode, Integer>, Integer>>falsePredicate());
         vv.getRenderContext().setVertexLabelTransformer(new Transformer<ClusterNode, String>() {

@@ -17,28 +17,20 @@
  */
 package at.tuwien.ifs.somtoolbox.visualization.clustering;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.geom.Point2D;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
+import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
+import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
 import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Tree;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PText;
 
-import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
-import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
-import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class for storing the clustering.

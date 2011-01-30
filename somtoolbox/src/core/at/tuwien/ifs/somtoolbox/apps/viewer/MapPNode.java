@@ -624,7 +624,7 @@ public class MapPNode extends PNode {
         }
     }
 
-    private float scaleLineWidth(int depth, int max, int min) {
+    private float scaleLineWidth(float depth, float max, float min) {
         float MAX_LINE_WIDTH = 50.0f;
         float MIN_LINE_WIDTH = 1.0f;
 
@@ -650,6 +650,25 @@ public class MapPNode extends PNode {
             currentClusteringTree = builder.createTree(units);
             HashMap<PNode, Integer> distanceInfo =  currentClusteringTree.getDendrogramDistanceInfo();
 
+            int maxLevel = Collections.max(distanceInfo.values());
+
+            ArrayList<ClusterNode> nodes = currentClusteringTree.getNodesAtLevel(maxLevel);
+
+            float maxMerge = Float.MIN_VALUE;
+            float minMerge = Float.MAX_VALUE;
+
+            for (int i=0; i<nodes.size(); i++) {
+                float merge1 = (float) nodes.get(i).getMergeCost();
+
+                for (int j=i+1; j<nodes.size(); j++) {
+                    float merge2 = (float) nodes.get(j).getMergeCost();
+                    float mergeDiff = Math.abs(merge1 - merge2);
+
+                    if (mergeDiff > maxMerge) maxMerge = mergeDiff;
+                    if (mergeDiff < minMerge) minMerge = mergeDiff;
+                }
+            }
+
             int maxDepth = Integer.MIN_VALUE;
             int minDepth = Integer.MAX_VALUE;
 
@@ -661,16 +680,16 @@ public class MapPNode extends PNode {
 
                 for (int j=i+1; j<depths.length; j++) {
                     int depth2 = depths[j];
-                    int depthDiff = Math.abs(depth1-depth2);
+                    int depthDiff = Math.abs(depth1 - depth2);
 
                     if (depthDiff > maxDepth) maxDepth = depthDiff;
-                    if (depthDiff<minDepth) minDepth = depthDiff;
+                    if (depthDiff < minDepth) minDepth = depthDiff;
                 }
             }
 
             clusterLines = new PNode();
 
-            double OFFSET = 25;
+            double OFFSET = 25.0;
 
             for (int col = 0; col < units.length; col++) {
                 for (int row = 0; row < units[col].length; row++) {
@@ -685,8 +704,12 @@ public class MapPNode extends PNode {
 
                         PPath line = PPath.createLine(x1, y1, x2, y2);
 
-                        int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
-                        float lineWidth = scaleLineWidth(depth, maxDepth, minDepth);
+                        ClusterNode n1 = currentClusteringTree.findClusterOf(unit1, maxLevel);
+                        ClusterNode n2 = currentClusteringTree.findClusterOf(unit2, maxLevel);
+
+                        //int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+                        float lineWidth = scaleLineWidth((float) Math.abs(n1.getMergeCost() - n2.getMergeCost()),
+                                maxMerge, minMerge);
 
                         line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
                         clusterLines.addChild(line);
@@ -703,8 +726,12 @@ public class MapPNode extends PNode {
 
                         PPath line = PPath.createLine(x1, y1, x2, y2);
 
-                        int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
-                        float lineWidth = scaleLineWidth(depth, maxDepth, minDepth);
+                        ClusterNode n1 = currentClusteringTree.findClusterOf(unit1, maxLevel);
+                        ClusterNode n2 = currentClusteringTree.findClusterOf(unit2, maxLevel);
+
+                        //int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+                        float lineWidth = scaleLineWidth((float) Math.abs(n1.getMergeCost() - n2.getMergeCost()),
+                                maxMerge, minMerge);
 
                         line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
                         clusterLines.addChild(line);
