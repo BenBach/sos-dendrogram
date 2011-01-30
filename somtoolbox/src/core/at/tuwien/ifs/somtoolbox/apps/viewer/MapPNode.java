@@ -133,6 +133,8 @@ public class MapPNode extends PNode {
 
     private TreeBuilder clusteringTreeBuilder;
 
+    private PNode clusterLines;
+
     /**
      * Default constructors - reading of input files not yet done.
      */
@@ -623,15 +625,15 @@ public class MapPNode extends PNode {
     }
 
     private float scaleLineWidth(int depth, int max, int min) {
-        float MAX_LINE_WIDTH = 15.0f;
+        float MAX_LINE_WIDTH = 50.0f;
         float MIN_LINE_WIDTH = 1.0f;
 
-        float lineWidth = (depth - max) > 0.0f ? depth - max : 1.0f;
-        lineWidth /= (max - min) != 0.0f ? max - min : 1.0f;
-        lineWidth *= (MAX_LINE_WIDTH - MIN_LINE_WIDTH);
+        float lineWidth = depth - min;
+        lineWidth /= max - min;
+        lineWidth *= MAX_LINE_WIDTH - MIN_LINE_WIDTH;
         lineWidth += MIN_LINE_WIDTH;
 
-        return lineWidth;
+        return Math.abs(lineWidth);
     }
 
     // Angela
@@ -639,16 +641,34 @@ public class MapPNode extends PNode {
      * Creates new {@link TreeBuilder}. if the builder is null, the current clustering is removed.
      */
     public void buildTree(TreeBuilder builder) throws ClusteringAbortedException {
+        if (clusterLines != null)
+            this.removeChild(clusterLines);
+
         if (builder == null) {
             currentClusteringTree = null;
         } else {
             currentClusteringTree = builder.createTree(units);
             HashMap<PNode, Integer> distanceInfo =  currentClusteringTree.getDendrogramDistanceInfo();
 
-            int maxDepth = Collections.max(distanceInfo.values());
-            int minDepth = Collections.min(distanceInfo.values());
+            int maxDepth = Integer.MIN_VALUE;
+            int minDepth = Integer.MAX_VALUE;
 
-            PNode clusterLines = new PNode();
+            Integer[] depths = new Integer[0];
+            depths = distanceInfo.values().toArray(depths);
+
+            for (int i=0; i<depths.length; i++) {
+                int depth1 = depths[i];
+
+                for (int j=i+1; j<depths.length; j++) {
+                    int depth2 = depths[j];
+                    int depthDiff = Math.abs(depth1-depth2);
+
+                    if (depthDiff > maxDepth) maxDepth = depthDiff;
+                    if (depthDiff<minDepth) minDepth = depthDiff;
+                }
+            }
+
+            clusterLines = new PNode();
 
             double OFFSET = 25;
 
@@ -668,7 +688,7 @@ public class MapPNode extends PNode {
                         int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
                         float lineWidth = scaleLineWidth(depth, maxDepth, minDepth);
 
-                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
+                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
                         clusterLines.addChild(line);
                     }
 
@@ -686,7 +706,7 @@ public class MapPNode extends PNode {
                         int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
                         float lineWidth = scaleLineWidth(depth, maxDepth, minDepth);
 
-                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
+                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
                         clusterLines.addChild(line);
                     }
                 }
