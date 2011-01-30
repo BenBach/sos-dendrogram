@@ -285,10 +285,10 @@ public class ClusteringTree extends PNode implements Serializable {
         ClusterNode child2 = parent.getChild2();
 
         if (child1 != null) {
-            recursiveCalculateDistances(parent.getChild1());
+            recursiveCalculateDistances(child1);
         }
         if (child2 != null) {
-            recursiveCalculateDistances(parent.getChild2());
+            recursiveCalculateDistances(child2);
         }
 
         // If it's a leaf
