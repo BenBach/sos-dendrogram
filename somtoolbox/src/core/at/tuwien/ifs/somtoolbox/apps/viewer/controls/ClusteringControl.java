@@ -525,10 +525,8 @@ public class ClusteringControl extends AbstractViewerControl {
             }
         };
 
-        final double maxMergeCost = Collections.max(clusterTree.getVertices(), mergeCostComparator).getMergeCost();
-        final double minMergeCost = Collections.min(clusterTree.getVertices(), mergeCostComparator).getMergeCost();
-
-        final Palette palette = mapPane.getState().getSOMViewer().getCurrentlySelectedPalette();
+        final double maxMergeCost = clusteringTree.getMaxMergeCost();
+        final double minMergeCost = clusteringTree.getMinMergeCost();
 
         final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(clusterLayout);
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
@@ -550,6 +548,8 @@ public class ClusteringControl extends AbstractViewerControl {
         vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<ClusterNode, Paint>() {
             @Override
             public Paint transform(ClusterNode clusterNode) {
+                Palette palette = mapPane.getState().getSOMViewer().getCurrentlySelectedPalette();
+
                 double pos = clusterNode.getMergeCost() - minMergeCost;
                 pos /= maxMergeCost - minMergeCost;
                 pos *= palette.getNumberOfColours() - 1;

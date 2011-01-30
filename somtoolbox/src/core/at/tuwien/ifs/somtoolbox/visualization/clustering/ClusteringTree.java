@@ -27,7 +27,6 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PText;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,6 +58,9 @@ public class ClusteringTree extends PNode implements Serializable {
     private Tree<ClusterNode, Integer> jungTree;
 
     private HashMap<PNode, Integer> distancesToTopNode;
+
+    private double minMergeCost = Double.NaN;
+    private double maxMergeCost = Double.NaN;
 
     /**
      * Initializes the tree with the given top Node.
@@ -261,6 +263,46 @@ public class ClusteringTree extends PNode implements Serializable {
         return allClusteringElements;
     }
 
+    private double getMaxMergeCost(ClusterNode node, double curMax) {
+        if (node == null) return curMax;
+
+        if(node.getMergeCost() > curMax) {
+            curMax = node.getMergeCost();
+        }
+
+        curMax = getMaxMergeCost(node.getChild1(), curMax);
+        curMax = getMaxMergeCost(node.getChild2(), curMax);
+
+        return curMax;
+    }
+
+    public double getMaxMergeCost() {
+        if(Double.isNaN(maxMergeCost))
+            maxMergeCost = getMaxMergeCost(topNode, topNode.getMergeCost());
+
+        return maxMergeCost;
+    }
+
+    private double getMinMergeCost(ClusterNode node, double curMin) {
+        if (node == null) return curMin;
+
+        if(node.getMergeCost() < curMin) {
+            curMin = node.getMergeCost();
+        }
+
+        curMin = getMinMergeCost(node.getChild1(), curMin);
+        curMin = getMinMergeCost(node.getChild2(), curMin);
+
+        return curMin;
+    }
+
+    public double getMinMergeCost() {
+        if(Double.isNaN(minMergeCost))
+            minMergeCost = getMinMergeCost(topNode, topNode.getMergeCost());
+
+        return minMergeCost;
+    }
+
     public HashMap<PNode, Integer> getDendrogramDistanceInfo() {
         // Foreach of the notes calculate distance to top note
         distancesToTopNode = new HashMap<PNode, Integer>();
@@ -416,8 +458,18 @@ public class ClusteringTree extends PNode implements Serializable {
      * @param col Color[] contaning the Palette
      */
     private void recolorTree(Color[] col, ClusterNode n) {
+        if(n == null) return;
+
         CommonSOMViewerStateData state = CommonSOMViewerStateData.getInstance();
 
+        int pos =
+                (int) (((n.getMergeCost() - getMinMergeCost()) / ( getMaxMergeCost() - getMinMergeCost())) * (col.length-1));
+
+        n.setPaint(col[pos]);
+
+        recolorTree(col, n.getChild1());
+        recolorTree(col, n.getChild2());
+/*
         if (n == null) {
             return;
         }
@@ -451,6 +503,7 @@ public class ClusteringTree extends PNode implements Serializable {
             recolorTree(col, n.getChild1());
             recolorTree(col, n.getChild2());
         }
+        */
     }
 
     /**
