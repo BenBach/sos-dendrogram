@@ -464,8 +464,9 @@ public class ClusteringTree extends PNode implements Serializable {
 
         int pos =
                 (int) (((n.getMergeCost() - getMinMergeCost()) / ( getMaxMergeCost() - getMinMergeCost())) * (col.length-1));
+        Color curCol = state.colorClusters ? col[pos] : Color.WHITE;
 
-        n.setPaint(col[pos]);
+        n.setPaint(curCol);
 
         recolorTree(col, n.getChild1());
         recolorTree(col, n.getChild2());
