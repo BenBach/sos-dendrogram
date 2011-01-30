@@ -26,6 +26,7 @@ import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
 import at.tuwien.ifs.somtoolbox.layers.quality.EntropyAndPurityCalculator;
 import at.tuwien.ifs.somtoolbox.util.GridBagConstraintsIFS;
 import at.tuwien.ifs.somtoolbox.util.UiUtils;
+import at.tuwien.ifs.somtoolbox.visualization.Palette;
 import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.Graph;
@@ -55,10 +56,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.ListIterator;
-import java.util.SortedMap;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -520,6 +518,18 @@ public class ClusteringControl extends AbstractViewerControl {
         Tree<ClusterNode, Integer> clusterTree = clusteringTree.getJUNGTree();
         TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree, 30, 100);
 
+        Comparator<ClusterNode> mergeCostComparator =new Comparator<ClusterNode>() {
+            @Override
+            public int compare(ClusterNode o1, ClusterNode o2) {
+                return Double.compare(o1.getMergeCost(), o2.getMergeCost());
+            }
+        };
+
+        final double maxMergeCost = Collections.max(clusterTree.getVertices(), mergeCostComparator).getMergeCost();
+        final double minMergeCost = Collections.min(clusterTree.getVertices(), mergeCostComparator).getMergeCost();
+
+        final Palette palette = mapPane.getState().getSOMViewer().getCurrentlySelectedPalette();
+
         final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(clusterLayout);
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
         vv.getRenderContext().setEdgeStrokeTransformer(new Transformer<Integer, Stroke>() {
@@ -535,6 +545,16 @@ public class ClusteringControl extends AbstractViewerControl {
             public String transform(ClusterNode clusterNode) {
                 Point2D.Double centroid = clusterNode.getCentroid();
                 return String.format("%d @ (%f, %f)", clusterNode.getNodes().length, centroid.getX(), centroid.getY());
+            }
+        });
+        vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<ClusterNode, Paint>() {
+            @Override
+            public Paint transform(ClusterNode clusterNode) {
+                double pos = clusterNode.getMergeCost() - minMergeCost;
+                pos /= maxMergeCost - minMergeCost;
+                pos *= palette.getNumberOfColours();
+
+                return palette.getColor((int)pos);
             }
         });
 
