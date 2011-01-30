@@ -297,7 +297,7 @@ public class ClusteringTree extends PNode implements Serializable {
         }
     }
 
-    public Integer CompareClusterDistanceOfPNodes(PNode node1, PNode node2) {
+    public int compareClusterDistanceOfPNodes(PNode node1, PNode node2) {
         return Math.abs(distancesToTopNode.get(node1) - distancesToTopNode.get(node2));
     }
 
