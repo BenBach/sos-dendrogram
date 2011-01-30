@@ -94,18 +94,18 @@ public class ClusterNode implements Serializable {
      */
     public double[] getMeanVector() {
 
-        int weightVectorLength = unitNodes[0].getUnit().getWeightVector().length;
+        int weightVectorLength = getUnitNodes()[0].getUnit().getWeightVector().length;
         if (mean == null) {
             mean = new double[weightVectorLength];
 
             for (int j = 0; j < weightVectorLength; j++) {
                 double sum = 0;
-                for (GeneralUnitPNode unitNode : unitNodes) {
+                for (GeneralUnitPNode unitNode : getUnitNodes()) {
 
                     sum = sum + unitNode.getUnit().getWeightVector()[j];
                 }
 
-                mean[j] = sum / unitNodes.length;
+                mean[j] = sum / getUnitNodes().length;
             }
         }
         return mean;
@@ -120,12 +120,12 @@ public class ClusterNode implements Serializable {
             double x = 0;
             double y = 0;
             int i;
-            for (i = 0; i < unitNodes.length; i++) {
-                x = x + unitNodes[i].getX();
-                y = y + unitNodes[i].getY();
+            for (i = 0; i < getUnitNodes().length; i++) {
+                x = x + getUnitNodes()[i].getX();
+                y = y + getUnitNodes()[i].getY();
             }
-            x = x / i + unitNodes[0].getWidth() / 2;
-            y = y / i + unitNodes[0].getHeight() / 2;
+            x = x / i + getUnitNodes()[0].getWidth() / 2;
+            y = y / i + getUnitNodes()[0].getHeight() / 2;
             centroid = new Point2D.Double(x, y);
             centroidX = x;
             centroidY = y;
@@ -150,13 +150,13 @@ public class ClusterNode implements Serializable {
      */
     public ClusterNode(ClusterNode n1, ClusterNode n2, int level) {
         this.level = level;
-        this.unitNodes = new GeneralUnitPNode[n1.getNodes().length + n2.getNodes().length];
+        this.setUnitNodes(new GeneralUnitPNode[n1.getNodes().length + n2.getNodes().length]);
 
         for (int i = 0; i < n1.getNodes().length; i++) {
-            this.unitNodes[i] = n1.getNodes()[i];
+            this.getUnitNodes()[i] = n1.getNodes()[i];
         }
         for (int i = 0; i < n2.getNodes().length; i++) {
-            this.unitNodes[i + n1.getNodes().length] = n2.getNodes()[i];
+            this.getUnitNodes()[i + n1.getNodes().length] = n2.getNodes()[i];
         }
         this.child1 = n1;
         this.child2 = n2;
@@ -210,8 +210,8 @@ public class ClusterNode implements Serializable {
      * @param level a number >= the number of total units.
      */
     public ClusterNode(GeneralUnitPNode leaf, int level) {
-        unitNodes = new GeneralUnitPNode[1];
-        unitNodes[0] = leaf;
+        setUnitNodes(new GeneralUnitPNode[1]);
+        getUnitNodes()[0] = leaf;
         border = makeBorder();
 
         this.level = level;
@@ -245,7 +245,7 @@ public class ClusterNode implements Serializable {
         int count = 0; // number of units containing inputs
 
         Label[] tmpLabels;// = new Label[5];
-        for (GeneralUnitPNode unitNode : unitNodes) {
+        for (GeneralUnitPNode unitNode : getUnitNodes()) {
             int num = unitNode.getUnit().getNumberOfMappedInputs();
             if (num > 0) {
                 count++;
@@ -379,19 +379,19 @@ public class ClusterNode implements Serializable {
      * Returns all the {@link GeneralUnitPNode}s contained in this cluster
      */
     public GeneralUnitPNode[] getNodes() {
-        return this.unitNodes;
+        return this.getUnitNodes();
     }
 
     public boolean containsNode(GeneralUnitPNode node) {
-        return ArrayUtils.contains(this.unitNodes, node);
+        return ArrayUtils.contains(this.getUnitNodes(), node);
     }
 
     public boolean containsAllNodes(Collection<GeneralUnitPNode> nodes) {
-        if (nodes.size() != unitNodes.length) {
+        if (nodes.size() != getUnitNodes().length) {
             return false;
         }
         for (GeneralUnitPNode node : nodes) {
-            if (!ArrayUtils.contains(this.unitNodes, node)) {
+            if (!ArrayUtils.contains(this.getUnitNodes(), node)) {
                 return false;
             }
         }
@@ -405,7 +405,7 @@ public class ClusterNode implements Serializable {
      */
     private BorderPNode makeBorder() {
         ArrayList<Rectangle2D> lines = new ArrayList<Rectangle2D>();
-        for (GeneralUnitPNode u : unitNodes) {
+        for (GeneralUnitPNode u : getUnitNodes()) {
             double left = u.getX();
             double right = u.getX() + u.getWidth();
             double top = u.getY();
@@ -530,6 +530,20 @@ public class ClusterNode implements Serializable {
     /** @return Returns the mergeCost. */
     public double getMergeCost() {
         return mergeCost;
+    }
+
+    /**
+     * @param unitNodes The unitNodes to set.
+     */
+    public void setUnitNodes(GeneralUnitPNode[] unitNodes) {
+        this.unitNodes = unitNodes;
+    }
+
+    /**
+     * @return Returns the unitNodes.
+     */
+    public GeneralUnitPNode[] getUnitNodes() {
+        return unitNodes;
     }
 
 }

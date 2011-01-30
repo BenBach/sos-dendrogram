@@ -17,20 +17,28 @@
  */
 package at.tuwien.ifs.somtoolbox.visualization.clustering;
 
-import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
-import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
-import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.geom.Point2D;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Tree;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PText;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
+import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
+import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
 
 /**
  * Class for storing the clustering.
@@ -58,6 +66,8 @@ public class ClusteringTree extends PNode implements Serializable {
 
     private Tree<ClusterNode, Integer> jungTree;
 
+    private HashMap<PNode, Integer> distancesToTopNode;
+
     /**
      * Initializes the tree with the given top Node.
      * 
@@ -71,7 +81,9 @@ public class ClusteringTree extends PNode implements Serializable {
     }
 
     public Tree<ClusterNode, Integer> getJUNGTree() {
-        if(jungTree != null) return jungTree;
+        if (jungTree != null) {
+            return jungTree;
+        }
 
         jungTree = new DelegateTree<ClusterNode, Integer>(new DirectedSparseGraph<ClusterNode, Integer>());
         jungTree.addVertex(topNode);
@@ -255,6 +267,50 @@ public class ClusteringTree extends PNode implements Serializable {
         // highest integer value to make sure it will always be the last element when painting
         allClusteringElements.put(new Integer(Integer.MAX_VALUE), colorStore);
         return allClusteringElements;
+    }
+
+    public HashMap<PNode, Integer> getDendrogramDistanceInfo() {
+        ArrayList<ClusterNode> clusterStorage = new ArrayList<ClusterNode>();
+
+        // Foreach of the notes calculate distance to top note
+        distancesToTopNode = new HashMap<PNode, Integer>();
+
+        recursiveCalculateDistances(topNode);
+
+        return distancesToTopNode;
+    }
+
+    private void recursiveCalculateDistances(ClusterNode parent) {
+        ClusterNode child1 = parent.getChild1();
+        ClusterNode child2 = parent.getChild2();
+
+        if (child1 != null) {
+            recursiveCalculateDistances(parent.getChild1());
+        }
+        if (child2 != null) {
+            recursiveCalculateDistances(parent.getChild2());
+        }
+
+        // If it's a leaf
+        if (child1 == null && child2 == null) {
+            for (PNode node : parent.getUnitNodes()) {
+                distancesToTopNode.put(node, CalculateDistanceToTopNode(node, 0));
+            }
+        }
+    }
+
+    private Integer CalculateDistanceToTopNode(PNode node, Integer startDistance) {
+        // Get parent
+        PNode parent = node.getParent();
+        if (parent == null) {
+            return startDistance;
+        }
+
+        return CalculateDistanceToTopNode(parent, startDistance + 1);
+    }
+
+    public Integer CompareClusterDistanceOfPNodes(PNode node1, PNode node2) {
+        return Math.abs(distancesToTopNode.get(node1) - distancesToTopNode.get(node2));
     }
 
     /**
@@ -457,4 +513,5 @@ public class ClusteringTree extends PNode implements Serializable {
         getAllChildrenUntil(level - 1, topNode, list);
         return list;
     }
+
 }
