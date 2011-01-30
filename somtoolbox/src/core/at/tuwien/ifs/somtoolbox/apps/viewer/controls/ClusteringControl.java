@@ -615,8 +615,16 @@ public class ClusteringControl extends AbstractViewerControl {
 
 
         vv.addGraphMouseListener(new GraphMouseListener<ClusterNode>() {
+            private ClusterNode previouslySelected;
+
             @Override
             public void graphClicked(ClusterNode clusterNode, MouseEvent me) {
+                if(previouslySelected != null)
+                    previouslySelected.setSelected(false);
+
+                clusterNode.setSelected(true);
+                previouslySelected = clusterNode;
+
                 numClusters = clusterNode.getLevel();
                 SortedMap<Integer, ClusterElementsStorage> m = mapPane.getMap().getCurrentClusteringTree().getAllClusteringElements();
                 if (m.containsKey(numClusters)) {

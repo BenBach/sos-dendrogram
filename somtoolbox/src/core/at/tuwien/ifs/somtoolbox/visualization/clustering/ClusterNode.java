@@ -43,6 +43,7 @@ public class ClusterNode implements Serializable {
     public static final Color INTIAL_BORDER_COLOUR = Color.BLACK;
 
     private Color borderColor = INTIAL_BORDER_COLOUR;
+    private Color selectedBorderColor = Color.RED;
 
     // increment serialVersionUID if class changes so it is incompatible with previous versions (-> [de]serialization )
     private static final long serialVersionUID = 2L;
@@ -86,6 +87,8 @@ public class ClusterNode implements Serializable {
     private double width;
 
     private double height;
+
+    private boolean isSelected;
 
     /**
      * Returns the mean vector of the cluster's weight vectors. Calculates it if it is not set yet.
@@ -398,6 +401,10 @@ public class ClusterNode implements Serializable {
         return true;
     }
 
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
     /**
      * Returns a border for this cluster
      * 
@@ -420,7 +427,7 @@ public class ClusterNode implements Serializable {
         for (Rectangle2D rect : lines) {
             PPath line = PPath.createLine((float) rect.getMinX(), (float) rect.getMinY(), (float) rect.getMaxX(),
                     (float) rect.getMaxY());
-            line.setStrokePaint(borderColor);
+            line.setStrokePaint(isSelected ? selectedBorderColor : borderColor);
             border.addChild(line);
         }
         return border;

@@ -798,12 +798,17 @@ public class MapPNode extends PNode {
 
         currentClusteringElements = elements;
 
+        LinkedList<PNode> selectedBorder = new LinkedList<PNode>();
+
         // show new elements
         if (elements != null) {
             for (ClusterElementsStorage n : currentClusteringElements.values()) {
                 if (n.clusterBorders != null) {
                     // System.out.println("Added border node " + n.border.hashCode() + " (" + n.hashCode() + ")");
                     for (PNode borderLine : n.clusterBorders) {
+                        if( ((PPath) borderLine.getChild(0)).getStrokePaint().equals(Color.RED))
+                            selectedBorder.add(borderLine);
+
                         addChild(borderLine);
                         borderLine.moveToFront();
                         if (currentVisualizationImage != null) {
@@ -827,6 +832,9 @@ public class MapPNode extends PNode {
                 }
             }
         }
+
+        for(PNode sb : selectedBorder)
+            sb.moveToFront();
         // System.out.println("Applied new clustering " + elements.hashCode());
     }
 
