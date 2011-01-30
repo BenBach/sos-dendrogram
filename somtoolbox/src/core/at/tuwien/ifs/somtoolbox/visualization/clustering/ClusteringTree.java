@@ -270,43 +270,31 @@ public class ClusteringTree extends PNode implements Serializable {
     }
 
     public HashMap<PNode, Integer> getDendrogramDistanceInfo() {
-        ArrayList<ClusterNode> clusterStorage = new ArrayList<ClusterNode>();
-
         // Foreach of the notes calculate distance to top note
         distancesToTopNode = new HashMap<PNode, Integer>();
 
-        recursiveCalculateDistances(topNode);
+        recursiveCalculateDistances(topNode, 0);
 
         return distancesToTopNode;
     }
 
-    private void recursiveCalculateDistances(ClusterNode parent) {
+    private void recursiveCalculateDistances(ClusterNode parent, Integer distance) {
         ClusterNode child1 = parent.getChild1();
         ClusterNode child2 = parent.getChild2();
 
         if (child1 != null) {
-            recursiveCalculateDistances(child1);
+            recursiveCalculateDistances(child1, distance + 1);
         }
         if (child2 != null) {
-            recursiveCalculateDistances(child2);
+            recursiveCalculateDistances(child2, distance + 1);
         }
 
         // If it's a leaf
         if (child1 == null && child2 == null) {
             for (PNode node : parent.getUnitNodes()) {
-                distancesToTopNode.put(node, CalculateDistanceToTopNode(node, 0));
+                distancesToTopNode.put(node, distance);
             }
         }
-    }
-
-    private Integer CalculateDistanceToTopNode(PNode node, Integer startDistance) {
-        // Get parent
-        PNode parent = node.getParent();
-        if (parent == null) {
-            return startDistance;
-        }
-
-        return CalculateDistanceToTopNode(parent, startDistance + 1);
     }
 
     public Integer CompareClusterDistanceOfPNodes(PNode node1, PNode node2) {

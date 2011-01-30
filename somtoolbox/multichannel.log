@@ -1,14 +1,14 @@
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
 FEIN: Skipping mixer #0 (Java Sound Audio Engine):Contains 'Java'
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
 FEIN: Skipping mixer #1 (Java Sound Audio Engine):Line unsupported: interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit, stereo, 4 bytes/frame, little-endian
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
 FEIN: Skipping mixer #2 (Java Sound Audio Engine):Line unsupported: interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit, stereo, 4 bytes/frame, little-endian
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
 FEIN: Skipping mixer #3 (Java Sound Audio Engine):Line unsupported: interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit, stereo, 4 bytes/frame, little-endian
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.multichannelPlayback.LineListModel <init>
 FEIN: Skipping mixer #4 (Java Sound Audio Engine):Line unsupported: interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit, stereo, 4 bytes/frame, little-endian
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.MultichannelPlaybackPanel setVisible
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.MultichannelPlaybackPanel setVisible
 FEIN: Using directory for decoded files: .\
-30.01.2011 14:59:18 at.tuwien.ifs.somtoolbox.apps.viewer.controls.MultichannelPlaybackPanel setVisible
+30.01.2011 17:09:27 at.tuwien.ifs.somtoolbox.apps.viewer.controls.MultichannelPlaybackPanel setVisible
 FEIN: Decoding probability: 0.5
