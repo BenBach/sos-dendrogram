@@ -17,6 +17,34 @@
  */
 package at.tuwien.ifs.somtoolbox.apps.viewer;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.logging.Logger;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PImage;
+import edu.umd.cs.piccolo.nodes.PPath;
+
 import at.tuwien.ifs.somtoolbox.SOMToolboxException;
 import at.tuwien.ifs.somtoolbox.apps.PaletteEditor;
 import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
@@ -36,21 +64,18 @@ import at.tuwien.ifs.somtoolbox.models.GrowingSOM;
 import at.tuwien.ifs.somtoolbox.util.LabelPNodeGenerator;
 import at.tuwien.ifs.somtoolbox.util.ProgressListener;
 import at.tuwien.ifs.somtoolbox.util.StdErrProgressWriter;
-import at.tuwien.ifs.somtoolbox.visualization.*;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PImage;
-import edu.umd.cs.piccolo.nodes.PPath;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.logging.Logger;
+import at.tuwien.ifs.somtoolbox.visualization.AbstractMatrixVisualizer;
+import at.tuwien.ifs.somtoolbox.visualization.BackgroundImageVisualizer;
+import at.tuwien.ifs.somtoolbox.visualization.Palette;
+import at.tuwien.ifs.somtoolbox.visualization.SearchResultHistogramVisualizer;
+import at.tuwien.ifs.somtoolbox.visualization.ThematicClassMapVisualizer;
+import at.tuwien.ifs.somtoolbox.visualization.Visualizations;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterElementsStorage;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterNode;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringAbortedException;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringTree;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.NonHierarchicalTreeBuilder;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.TreeBuilder;
 
 /**
  * The graphical representation of a map in the {@link SOMViewer} application. This class makes use of the <a
@@ -641,14 +666,15 @@ public class MapPNode extends PNode {
      * Creates new {@link TreeBuilder}. if the builder is null, the current clustering is removed.
      */
     public void buildTree(TreeBuilder builder) throws ClusteringAbortedException {
-        if (clusterLines != null)
+        if (clusterLines != null) {
             this.removeChild(clusterLines);
+        }
 
         if (builder == null) {
             currentClusteringTree = null;
         } else {
             currentClusteringTree = builder.createTree(units);
-            HashMap<PNode, Integer> distanceInfo =  currentClusteringTree.getDendrogramDistanceInfo();
+            HashMap<PNode, Integer> distanceInfo = currentClusteringTree.getDendrogramDistanceInfo();
 
             int maxLevel = Collections.max(distanceInfo.values());
 
@@ -657,15 +683,19 @@ public class MapPNode extends PNode {
             float maxMerge = Float.MIN_VALUE;
             float minMerge = Float.MAX_VALUE;
 
-            for (int i=0; i<nodes.size(); i++) {
+            for (int i = 0; i < nodes.size(); i++) {
                 float merge1 = (float) nodes.get(i).getMergeCost();
 
-                for (int j=i+1; j<nodes.size(); j++) {
+                for (int j = i + 1; j < nodes.size(); j++) {
                     float merge2 = (float) nodes.get(j).getMergeCost();
                     float mergeDiff = Math.abs(merge1 - merge2);
 
-                    if (mergeDiff > maxMerge) maxMerge = mergeDiff;
-                    if (mergeDiff < minMerge) minMerge = mergeDiff;
+                    if (mergeDiff > maxMerge) {
+                        maxMerge = mergeDiff;
+                    }
+                    if (mergeDiff < minMerge) {
+                        minMerge = mergeDiff;
+                    }
                 }
             }
 
@@ -675,15 +705,19 @@ public class MapPNode extends PNode {
             Integer[] depths = new Integer[0];
             depths = distanceInfo.values().toArray(depths);
 
-            for (int i=0; i<depths.length; i++) {
+            for (int i = 0; i < depths.length; i++) {
                 int depth1 = depths[i];
 
-                for (int j=i+1; j<depths.length; j++) {
+                for (int j = i + 1; j < depths.length; j++) {
                     int depth2 = depths[j];
                     int depthDiff = Math.abs(depth1 - depth2);
 
-                    if (depthDiff > maxDepth) maxDepth = depthDiff;
-                    if (depthDiff < minDepth) minDepth = depthDiff;
+                    if (depthDiff > maxDepth) {
+                        maxDepth = depthDiff;
+                    }
+                    if (depthDiff < minDepth) {
+                        minDepth = depthDiff;
+                    }
                 }
             }
 
@@ -696,7 +730,8 @@ public class MapPNode extends PNode {
 
             final double maxMergeCost = Collections.max(currentClusteringTree.getJUNGTree().getVertices(),
                     mergeCostComparator).getMergeCost();
-            final double minMergeCost = Collections.min(currentClusteringTree.getJUNGTree().getVertices(), mergeCostComparator).getMergeCost();
+            final double minMergeCost = Collections.min(currentClusteringTree.getJUNGTree().getVertices(),
+                    mergeCostComparator).getMergeCost();
 
             clusterLines = new PNode();
             PNode clusterColors = new PNode();
@@ -709,8 +744,7 @@ public class MapPNode extends PNode {
                 for (int row = 0; row < units[col].length; row++) {
                     GeneralUnitPNode unit = units[col][row];
                     ClusterNode n = currentClusteringTree.findClusterOf(unit, maxLevel);
-                    int pos = (int) (((n.getMergeCost() - minMergeCost) / (maxMergeCost - minMergeCost)) * palette
-                                                .getNumberOfColours());
+                    int pos = (int) ((n.getMergeCost() - minMergeCost) / (maxMergeCost - minMergeCost) * palette.getNumberOfColours());
 
                     PNode coloring = new PNode();
                     coloring.setBounds(unit.getBounds());
@@ -732,7 +766,7 @@ public class MapPNode extends PNode {
                         ClusterNode n1 = currentClusteringTree.findClusterOf(unit1, maxLevel);
                         ClusterNode n2 = currentClusteringTree.findClusterOf(unit2, maxLevel);
 
-                        //int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+                        // int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
                         float lineWidth = scaleLineWidth((float) Math.abs(n1.getMergeCost() - n2.getMergeCost()),
                                 maxMerge, minMerge);
 
@@ -754,7 +788,7 @@ public class MapPNode extends PNode {
                         ClusterNode n1 = currentClusteringTree.findClusterOf(unit1, maxLevel);
                         ClusterNode n2 = currentClusteringTree.findClusterOf(unit2, maxLevel);
 
-                        //int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+                        // int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
                         float lineWidth = scaleLineWidth((float) Math.abs(n1.getMergeCost() - n2.getMergeCost()),
                                 maxMerge, minMerge);
 
@@ -823,7 +857,7 @@ public class MapPNode extends PNode {
                     // System.out.println("Added border node " + n.border.hashCode() + " (" + n.hashCode() + ")");
                     for (PNode borderLine : n.clusterBorders) {
                         addChild(borderLine);
-                        borderLine.moveToBack();
+                        borderLine.moveToFront();
                         if (currentVisualizationImage != null) {
                             borderLine.moveInFrontOf(currentVisualizationImage);
                         }
