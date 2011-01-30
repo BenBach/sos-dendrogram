@@ -17,31 +17,6 @@
  */
 package at.tuwien.ifs.somtoolbox.apps.viewer;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.logging.Logger;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PImage;
-import edu.umd.cs.piccolo.nodes.PPath;
-
 import at.tuwien.ifs.somtoolbox.SOMToolboxException;
 import at.tuwien.ifs.somtoolbox.apps.PaletteEditor;
 import at.tuwien.ifs.somtoolbox.data.SOMLibClassInformation;
@@ -61,17 +36,21 @@ import at.tuwien.ifs.somtoolbox.models.GrowingSOM;
 import at.tuwien.ifs.somtoolbox.util.LabelPNodeGenerator;
 import at.tuwien.ifs.somtoolbox.util.ProgressListener;
 import at.tuwien.ifs.somtoolbox.util.StdErrProgressWriter;
-import at.tuwien.ifs.somtoolbox.visualization.AbstractMatrixVisualizer;
-import at.tuwien.ifs.somtoolbox.visualization.BackgroundImageVisualizer;
-import at.tuwien.ifs.somtoolbox.visualization.Palette;
-import at.tuwien.ifs.somtoolbox.visualization.SearchResultHistogramVisualizer;
-import at.tuwien.ifs.somtoolbox.visualization.ThematicClassMapVisualizer;
-import at.tuwien.ifs.somtoolbox.visualization.Visualizations;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusterElementsStorage;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringAbortedException;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.ClusteringTree;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.NonHierarchicalTreeBuilder;
-import at.tuwien.ifs.somtoolbox.visualization.clustering.TreeBuilder;
+import at.tuwien.ifs.somtoolbox.visualization.*;
+import at.tuwien.ifs.somtoolbox.visualization.clustering.*;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PImage;
+import edu.umd.cs.piccolo.nodes.PPath;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * The graphical representation of a map in the {@link SOMViewer} application. This class makes use of the <a
@@ -643,6 +622,18 @@ public class MapPNode extends PNode {
         }
     }
 
+    private float scaleLineWidth(int depth, int max, int min) {
+        float MAX_LINE_WIDTH = 15.0f;
+        float MIN_LINE_WIDTH = 1.0f;
+
+        float lineWidth = (depth - max) > 0.0f ? depth - max : 1.0f;
+        lineWidth /= (max - min) != 0.0f ? max - min : 1.0f;
+        lineWidth *= (MAX_LINE_WIDTH - MIN_LINE_WIDTH);
+        lineWidth += MIN_LINE_WIDTH;
+
+        return lineWidth;
+    }
+
     // Angela
     /**
      * Creates new {@link TreeBuilder}. if the builder is null, the current clustering is removed.
@@ -652,17 +643,20 @@ public class MapPNode extends PNode {
             currentClusteringTree = null;
         } else {
             currentClusteringTree = builder.createTree(units);
-            currentClusteringTree.getDendrogramDistanceInfo();
+            HashMap<PNode, Integer> distanceInfo =  currentClusteringTree.getDendrogramDistanceInfo();
+
+            int maxDepth = Collections.max(distanceInfo.values());
+            int minDepth = Collections.min(distanceInfo.values());
 
             PNode clusterLines = new PNode();
 
             double OFFSET = 25;
 
-            for (int row = 0; row < units.length; row++) {
-                for (int col = 0; col < units[row].length; col++) {
-                    if (col < units[row].length - 1) {
-                        GeneralUnitPNode unit1 = units[row][col];
-                        GeneralUnitPNode unit2 = units[row][col + 1];
+            for (int col = 0; col < units.length; col++) {
+                for (int row = 0; row < units[col].length; row++) {
+                    if (row < units[col].length - 1) {
+                        GeneralUnitPNode unit1 = units[col][row];
+                        GeneralUnitPNode unit2 = units[col][row + 1];
 
                         float x1 = (float) (unit1.getX() + unit1.getWidth() / 2);
                         float y1 = (float) (unit1.getY() + unit1.getHeight() - OFFSET);
@@ -670,17 +664,17 @@ public class MapPNode extends PNode {
                         float y2 = (float) (unit2.getY() + OFFSET);
 
                         PPath line = PPath.createLine(x1, y1, x2, y2);
-                        // TODO adjust width
-                        int dist = currentClusteringTree.CompareClusterDistanceOfPNodes(unit1, unit2);
 
-                        line.setStroke(new BasicStroke(10.0f * dist + 5.0f, BasicStroke.CAP_ROUND,
-                                BasicStroke.JOIN_BEVEL));
+                        int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+                        float lineWidth = scaleLineWidth(depth, maxDepth, minDepth);
+
+                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
                         clusterLines.addChild(line);
                     }
 
-                    if (row < units.length - 1) {
-                        GeneralUnitPNode unit1 = units[row][col];
-                        GeneralUnitPNode unit2 = units[row + 1][col];
+                    if (col < units.length - 1) {
+                        GeneralUnitPNode unit1 = units[col][row];
+                        GeneralUnitPNode unit2 = units[col + 1][row];
 
                         float x1 = (float) (unit1.getX() + unit1.getWidth() + OFFSET);
                         float y1 = (float) (unit1.getY() + unit1.getHeight() / 2);
@@ -689,11 +683,10 @@ public class MapPNode extends PNode {
 
                         PPath line = PPath.createLine(x1, y1, x2, y2);
 
-                        // TODO adjust width
-                        int dist = currentClusteringTree.CompareClusterDistanceOfPNodes(unit1, unit2);
+                        int depth = currentClusteringTree.compareClusterDistanceOfPNodes(unit1, unit2);
+                        float lineWidth = scaleLineWidth(depth, maxDepth, minDepth);
 
-                        line.setStroke(new BasicStroke(10.0f * dist + 5.0f, BasicStroke.CAP_ROUND,
-                                BasicStroke.JOIN_BEVEL));
+                        line.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
                         clusterLines.addChild(line);
                     }
                 }
