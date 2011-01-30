@@ -56,7 +56,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.ListIterator;
+import java.util.SortedMap;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -515,20 +518,17 @@ public class ClusteringControl extends AbstractViewerControl {
 
         if(clusteringTree == null) return;
 
-        Tree<ClusterNode, Integer> clusterTree = clusteringTree.getJUNGTree();
-        TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree, 30, 100);
+        Tree<ClusterNode, Integer> tree = clusteringTree.getJUNGTree();
 
-        Comparator<ClusterNode> mergeCostComparator = new Comparator<ClusterNode>() {
-            @Override
-            public int compare(ClusterNode o1, ClusterNode o2) {
-                return Double.compare(o1.getMergeCost(), o2.getMergeCost());
-            }
-        };
+        TreeLayout<ClusterNode, Integer> layout = new TreeLayout<ClusterNode, Integer>(tree, 30, 100);
 
         final double maxMergeCost = clusteringTree.getMaxMergeCost();
         final double minMergeCost = clusteringTree.getMinMergeCost();
 
-        final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(clusterLayout);
+        final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(layout);
+
+        // setup edge rendering
+
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
         vv.getRenderContext().setEdgeStrokeTransformer(new Transformer<Integer, Stroke>() {
             @Override
@@ -538,6 +538,15 @@ public class ClusteringControl extends AbstractViewerControl {
         });
         vv.getRenderContext().setEdgeArrowPredicate(
                 PredicateUtils.<Context<Graph<ClusterNode, Integer>, Integer>>falsePredicate());
+                vv.getRenderContext().setEdgeDrawPaintTransformer(new Transformer<Integer, Paint>() {
+            @Override
+            public Paint transform(Integer edge) {
+                return Color.BLACK;
+            }
+        });
+
+        // setup vertex rendering
+
         vv.getRenderContext().setVertexLabelTransformer(new Transformer<ClusterNode, String>() {
             @Override
             public String transform(ClusterNode clusterNode) {
@@ -557,6 +566,42 @@ public class ClusteringControl extends AbstractViewerControl {
                 return palette.getColor((int) pos);
             }
         });
+        vv.getRenderContext().setVertexStrokeTransformer(new Transformer<ClusterNode, Stroke>() {
+            @Override
+            public Stroke transform(ClusterNode clusterNode) {
+                if (vv.getPickedVertexState().isPicked(clusterNode))
+                    return new BasicStroke(3.0f);
+                else return new BasicStroke(1.0f);
+            }
+        });
+        vv.setVertexToolTipTransformer(new Transformer<ClusterNode, String>() {
+            @Override
+            public String transform(ClusterNode clusterNode) {
+                StringBuilder result = new StringBuilder();
+
+                result.append("Level: ").append(clusterNode.getLevel()).append("\r\n");
+                result.append("Merge-cost: ").append(String.format("%.2f", clusterNode.getMergeCost())).append("\r\n");
+                result.append("Centroid: ").append(String.format("%.2f", clusterNode.getCentroid().getX())).
+                        append(", ").append(String.format("%.2f", clusterNode.getCentroid().getY())).append("\r\n");
+                result.append("Factor-value: ").append(String.format("%.2f", clusterNode.getFactorValue())).append
+                        ("\r\n");
+                result.append("#Nodes: ").append(clusterNode.getUnitNodes().length).append("\r\n");
+                result.append("Mean-vector: ");
+
+                for(double d:clusterNode.getMeanVector())
+                    result.append(String.format("%.2f", d)).append(", ");
+
+                result.append("\r\n");
+
+                result.append("Bounds: (x=").append(String.format("%.2f", clusterNode.getX()))
+                        .append(", y=").append(String.format("%.2f", clusterNode.getY()))
+                        .append(", w=").append(String.format("%.2f", clusterNode.getWidth()))
+                        .append(", h=").append(String.format("%.2f", clusterNode.getHeight()))
+                        .append(")\r\n");
+
+                return result.toString();
+            }
+        });
 
         GraphZoomScrollPane vv2 = new GraphZoomScrollPane(vv);
 
@@ -567,10 +612,19 @@ public class ClusteringControl extends AbstractViewerControl {
         vv.setGraphMouse(graphMouse);
         graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
 
+
+
         vv.addGraphMouseListener(new GraphMouseListener<ClusterNode>() {
             @Override
             public void graphClicked(ClusterNode clusterNode, MouseEvent me) {
                 numClusters = clusterNode.getLevel();
+                SortedMap<Integer, ClusterElementsStorage> m = mapPane.getMap().getCurrentClusteringTree().getAllClusteringElements();
+                if (m.containsKey(numClusters)) {
+                    st = m.get(numClusters).sticky;
+                } else {
+                    st = false;
+                }
+                sticky.setSelected(st);
                 redrawClustering();
             }
 
