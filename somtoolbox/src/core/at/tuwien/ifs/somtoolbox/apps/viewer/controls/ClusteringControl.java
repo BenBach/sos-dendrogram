@@ -552,9 +552,9 @@ public class ClusteringControl extends AbstractViewerControl {
             public Paint transform(ClusterNode clusterNode) {
                 double pos = clusterNode.getMergeCost() - minMergeCost;
                 pos /= maxMergeCost - minMergeCost;
-                pos *= palette.getNumberOfColours();
+                pos *= palette.getNumberOfColours() - 1;
 
-                return palette.getColor((int)pos);
+                return palette.getColor((int) pos);
             }
         });
 
