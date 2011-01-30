@@ -17,23 +17,20 @@
  */
 package at.tuwien.ifs.somtoolbox.visualization.clustering;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.geom.Point2D;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PText;
-
 import at.tuwien.ifs.somtoolbox.apps.viewer.CommonSOMViewerStateData;
 import at.tuwien.ifs.somtoolbox.apps.viewer.GeneralUnitPNode;
 import at.tuwien.ifs.somtoolbox.apps.viewer.handlers.EditLabelEventListener;
+import edu.uci.ics.jung.graph.DelegateTree;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.Tree;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PText;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class for storing the clustering.
@@ -59,6 +56,8 @@ public class ClusteringTree extends PNode implements Serializable {
 
     public static final Font defaultFont = new Font("Sans", Font.PLAIN, 40);
 
+    private Tree<ClusterNode, Integer> jungTree;
+
     /**
      * Initializes the tree with the given top Node.
      * 
@@ -69,6 +68,37 @@ public class ClusteringTree extends PNode implements Serializable {
         this.width = width;
         topNode = top;
         startFontSize = 6 * width; // 10-> 6
+    }
+
+    public Tree<ClusterNode, Integer> getJUNGTree() {
+        if(jungTree != null) return jungTree;
+
+        jungTree = new DelegateTree<ClusterNode, Integer>(new DirectedSparseGraph<ClusterNode, Integer>());
+        jungTree.addVertex(topNode);
+
+        buildJUNGTree(jungTree, topNode, new AtomicInteger(0));
+
+        return jungTree;
+    }
+
+    private void buildJUNGTree(Tree<ClusterNode, Integer> tree, ClusterNode curNode, AtomicInteger curEdge) {
+        if (curNode == null) {
+            return;
+        }
+
+        ClusterNode c1 = curNode.getChild1();
+        ClusterNode c2 = curNode.getChild2();
+
+        if (c1 != null) {
+            tree.addEdge(curEdge.incrementAndGet(), curNode, c1);
+        }
+
+        if (c2 != null) {
+            tree.addEdge(curEdge.incrementAndGet(), curNode, c2);
+        }
+
+        buildJUNGTree(tree, c1, curEdge);
+        buildJUNGTree(tree, c2, curEdge);
     }
 
     public ClusterNode findNode(int lvl) {

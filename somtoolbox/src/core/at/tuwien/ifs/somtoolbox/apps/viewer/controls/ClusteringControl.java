@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -122,25 +123,7 @@ public class ClusteringControl extends AbstractViewerControl {
         updateControlDisplay();
     }
 
-    private void buildJUNGTree(Tree<ClusterNode, Integer> tree, ClusterNode curNode, AtomicInteger curEdge) {
-        if (curNode == null) {
-            return;
-        }
 
-        ClusterNode c1 = curNode.getChild1();
-        ClusterNode c2 = curNode.getChild2();
-
-        if (c1 != null) {
-            tree.addEdge(curEdge.incrementAndGet(), curNode, c1);
-        }
-
-        if (c2 != null) {
-            tree.addEdge(curEdge.incrementAndGet(), curNode, c2);
-        }
-
-        buildJUNGTree(tree, c1, curEdge);
-        buildJUNGTree(tree, c2, curEdge);
-    }
 
     public void init() {
 
@@ -535,17 +518,8 @@ public class ClusteringControl extends AbstractViewerControl {
 
         if(clusteringTree == null) return;
 
-        ClusterNode node = clusteringTree.findNode(1);
-
-        Tree<ClusterNode, Integer> clusterTree = new DelegateTree<ClusterNode,
-                Integer>(new DirectedSparseGraph<ClusterNode, Integer>());
-
-
-        clusterTree.addVertex(node);
-        buildJUNGTree(clusterTree, node, new AtomicInteger(0));
-
-        TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree,
-                30, 100);
+        Tree<ClusterNode, Integer> clusterTree = clusteringTree.getJUNGTree();
+        TreeLayout<ClusterNode, Integer> clusterLayout = new TreeLayout<ClusterNode, Integer>(clusterTree, 30, 100);
 
         final VisualizationViewer<ClusterNode, Integer> vv = new VisualizationViewer<ClusterNode, Integer>(clusterLayout);
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<ClusterNode, Integer>());
@@ -554,7 +528,8 @@ public class ClusteringControl extends AbstractViewerControl {
         vv.getRenderContext().setVertexLabelTransformer(new Transformer<ClusterNode, String>() {
             @Override
             public String transform(ClusterNode clusterNode) {
-                return "" + clusterNode.getLevel();
+                Point2D.Double centroid = clusterNode.getCentroid();
+                return String.format("%d @ (%f, %f)", clusterNode.getNodes().length, centroid.getX(), centroid.getY());
             }
         });
 

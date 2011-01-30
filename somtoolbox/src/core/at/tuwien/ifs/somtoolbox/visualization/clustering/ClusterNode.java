@@ -38,29 +38,7 @@ import java.util.*;
  * @version $Id: ClusterNode.java 3938 2010-11-17 15:15:25Z mayer $
  */
 public class ClusterNode implements Serializable {
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        ClusterNode that = (ClusterNode) o;
-
-        if (level != that.level) return false;
-        if (child1 != null ? !child1.equals(that.child1) : that.child1 != null) return false;
-        if (child2 != null ? !child2.equals(that.child2) : that.child2 != null) return false;
-        if (!Arrays.equals(unitNodes, that.unitNodes)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = unitNodes != null ? Arrays.hashCode(unitNodes) : 0;
-        result = 31 * result + level;
-        result = 31 * result + (child1 != null ? child1.hashCode() : 0);
-        result = 31 * result + (child2 != null ? child2.hashCode() : 0);
-        return result;
-    }
 
     public static final Color INTIAL_BORDER_COLOUR = Color.BLACK;
 
